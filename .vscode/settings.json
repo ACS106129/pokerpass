@@ -1,3 +1,11 @@
 {
-    "emulator.emulatorPath": "~/Library/Android/sdk/emulator"
+    "emulator.emulatorPath": "~/Library/Android/sdk/emulator",
+    "[dart]": {
+        "editor.tabSize": 2,
+        "editor.insertSpaces": true,
+        "editor.detectIndentation": false,
+        "editor.suggest.insertMode": "replace",
+        "editor.formatOnSave": false,
+        "editor.formatOnType": false
+    }
 }
