@@ -51,6 +51,8 @@ class Win32Window {
   // If true, closing this window will quit the application.
   void SetQuitOnClose(bool quit_on_close);
 
+  void SetIsScale(bool is_scale);
+
   // Return a RECT representing the bounds of the current client area.
   RECT GetClientArea();
 
@@ -87,6 +89,8 @@ class Win32Window {
   static Win32Window* GetThisFromHandle(HWND const window) noexcept;
 
   bool quit_on_close_ = false;
+
+  bool is_scale_ = true;
 
   // window handle for top level window.
   HWND window_handle_ = nullptr;
