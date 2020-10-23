@@ -1,88 +1,42 @@
-import 'dart:io';
 import 'dart:ui';
+
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
+import 'package:pokerpass/setting/Setting.dart' as setting;
 import 'package:window_size/window_size.dart';
 
-import 'package:flutter/material.dart';
-import 'package:flutter_localizations/flutter_localizations.dart';
+import 'home_page.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
-  if (Platform.isLinux || Platform.isMacOS || Platform.isWindows) {
+  // windows sizebox will be disabled, others preserve it
+  if (setting.isDesktop) {
     getCurrentScreen().then((screen) {
       setWindowFrame(Rect.fromCenter(
           center: screen.frame.center,
-          width: MyApp.WIDTH,
-          height: MyApp.HEIGHT));
+          width: setting.width,
+          height: setting.height));
     });
     setWindowTitle('PokerPass');
-    setWindowMinSize(Size(MyApp.WIDTH, MyApp.HEIGHT));
-    setWindowMaxSize(Size(MyApp.WIDTH, MyApp.HEIGHT));
+    setWindowMinSize(Size(setting.width, setting.height));
+    setWindowMaxSize(Size(setting.width, setting.height));
   }
   runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
-  static const WIDTH = 800.0;
-  static const HEIGHT = 600.0;
-
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return CupertinoApp(
       title: 'PokerPass System',
-      theme: ThemeData(
-        primarySwatch: Colors.red,
-        visualDensity: VisualDensity.adaptivePlatformDensity,
-      ),
-      home: MyHomePage(title: 'PokerPass'),
-    );
-  }
-}
-
-class MyHomePage extends StatefulWidget {
-  MyHomePage({Key key, this.title}) : super(key: key);
-  final String title;
-  @override
-  _MyHomePageState createState() => _MyHomePageState();
-}
-
-class _MyHomePageState extends State<MyHomePage> {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            FlatButton(
-              onPressed: () {},
-              child: Text(
-                '登入',
-                style: TextStyle(fontSize: 36),
-              ),
-              color: Colors.blue,
-              padding: const EdgeInsets.symmetric(
-                horizontal: 50,
-                vertical: 20,
-              ),
-            ),
-            const SizedBox(
-              height: 75,
-            ),
-            FlatButton(
-              onPressed: () {},
-              child: Text(
-                '註冊',
-                style: TextStyle(fontSize: 36),
-              ),
-              color: Colors.yellow,
-              padding: const EdgeInsets.symmetric(
-                horizontal: 50,
-                vertical: 20,
-              ),
-            ),
-          ],
+      theme: CupertinoThemeData(
+        brightness: setting.isTest ? Brightness.dark : null,
+        scaffoldBackgroundColor: CupertinoDynamicColor.withBrightness(
+          color: Colors.white,
+          darkColor: Colors.grey.shade900,
         ),
       ),
+      home: HomePage(title: 'PokerPass'),
     );
   }
 }
