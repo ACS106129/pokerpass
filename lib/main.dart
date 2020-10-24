@@ -30,7 +30,7 @@ class MyApp extends StatelessWidget {
     return CupertinoApp(
       title: 'PokerPass System',
       theme: CupertinoThemeData(
-        brightness: setting.isTest ? Brightness.dark : null,
+        brightness: setting.DebugConfig.brightness,
         scaffoldBackgroundColor: CupertinoDynamicColor.withBrightness(
           color: Colors.white,
           darkColor: Colors.grey.shade900,
