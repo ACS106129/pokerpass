@@ -1,6 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:pokerpass/login_page.dart';
+import 'package:pokerpass/register_page.dart';
 import 'package:pokerpass/setting/Setting.dart' as setting;
 
 class HomePage extends StatefulWidget {
@@ -28,7 +30,7 @@ class _HomePageState extends State<HomePage> {
   Widget _homePageContent(BuildContext context) {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
-      children: <Widget>[
+      children: [
         Container(
           width: MediaQuery.of(context).size.width * 0.8,
           child: Column(
@@ -47,16 +49,9 @@ class _HomePageState extends State<HomePage> {
                     allow: true,
                   ),
                 ],
-                /*decoration: BoxDecoration(
-                  color: CupertinoDynamicColor.withBrightness(
-                    color: CupertinoColors.white,
-                    darkColor: CupertinoColors.black,
-                  ),
-                  border: _kDefaultRoundedBorder,
-                  borderRadius: BorderRadius.all(Radius.circular(5.0)),
-                ),*/
                 cursorColor: Colors.blue.shade200,
                 placeholder: '請輸入用戶名(ID)',
+                autofocus: false,
                 maxLines: 1,
               ),
             ],
@@ -66,7 +61,13 @@ class _HomePageState extends State<HomePage> {
           height: MediaQuery.of(context).size.height / 10,
         ),
         CupertinoButton(
-          onPressed: () {},
+          onPressed: () {
+            Navigator.push(
+                context,
+                CupertinoPageRoute(
+                  builder: (context) => LoginPage(),
+                  settings: RouteSettings(name: '/login_page')
+                ));},
           child: Text(
             '登入',
             style: TextStyle(fontSize: 36),
@@ -81,7 +82,14 @@ class _HomePageState extends State<HomePage> {
           height: MediaQuery.of(context).size.height / 10,
         ),
         CupertinoButton(
-          onPressed: () {},
+          onPressed: () {
+            Navigator.push(
+                context,
+                CupertinoPageRoute(
+                  builder: (context) => RegisterPage(),
+                  settings: RouteSettings(name: '/register_page')
+                ));
+          },
           child: Text(
             '註冊',
             style: TextStyle(fontSize: 36),

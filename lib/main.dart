@@ -2,6 +2,7 @@ import 'dart:ui';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:pokerpass/register_page.dart';
 import 'package:pokerpass/setting/Setting.dart' as setting;
 import 'package:window_size/window_size.dart';
 
@@ -36,6 +37,9 @@ class MyApp extends StatelessWidget {
           darkColor: Colors.grey.shade900,
         ),
       ),
+      routes: {
+        RegisterPage.id: (context) => RegisterPage(),
+      },
       home: HomePage(title: 'PokerPass'),
     );
   }
