@@ -4,10 +4,10 @@ import 'package:flutter/services.dart';
 import 'package:pokerpass/login_page.dart';
 import 'package:pokerpass/register_page.dart';
 import 'package:pokerpass/setting/Setting.dart' as setting;
+import 'package:pokerpass/utility/area.dart';
 
 class HomePage extends StatefulWidget {
-  final String title;
-  HomePage({Key key, this.title}) : super(key: key);
+  static const String id = 'home_page';
   @override
   _HomePageState createState() => _HomePageState();
 }
@@ -17,12 +17,14 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return CupertinoPageScaffold(
       navigationBar: !setting.isDesktop
-          ? CupertinoNavigationBar(
+          ? const CupertinoNavigationBar(
               middle: const Text('撲克牌通行碼認證系統'),
             )
           : null,
-      child: Center(
-        child: _homePageContent(context),
+      child: SafeArea(
+        child: Center(
+          child: _homePageContent(context),
+        ),
       ),
     );
   }
@@ -32,7 +34,7 @@ class _HomePageState extends State<HomePage> {
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         Container(
-          width: MediaQuery.of(context).size.width * 0.8,
+          width: getSafeArea(context).width * 0.8,
           child: Column(
             children: [
               CupertinoTextField(
@@ -58,16 +60,12 @@ class _HomePageState extends State<HomePage> {
           ),
         ),
         SizedBox(
-          height: MediaQuery.of(context).size.height / 10,
+          height: getSafeArea(context).height / 10,
         ),
         CupertinoButton(
           onPressed: () {
-            Navigator.push(
-                context,
-                CupertinoPageRoute(
-                  builder: (context) => LoginPage(),
-                  settings: RouteSettings(name: '/login_page')
-                ));},
+            Navigator.pushNamed(context, LoginPage.id);
+          },
           child: Text(
             '登入',
             style: TextStyle(fontSize: 36),
@@ -79,16 +77,11 @@ class _HomePageState extends State<HomePage> {
           ),
         ),
         SizedBox(
-          height: MediaQuery.of(context).size.height / 10,
+          height: getSafeArea(context).height / 10,
         ),
         CupertinoButton(
           onPressed: () {
-            Navigator.push(
-                context,
-                CupertinoPageRoute(
-                  builder: (context) => RegisterPage(),
-                  settings: RouteSettings(name: '/register_page')
-                ));
+            Navigator.pushNamed(context, RegisterPage.id);
           },
           child: Text(
             '註冊',

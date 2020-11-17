@@ -2,11 +2,13 @@ import 'dart:ui';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:pokerpass/2FA/qrcode_page.dart';
+import 'package:pokerpass/PC/pc_page.dart';
+import 'package:pokerpass/home_page.dart';
+import 'package:pokerpass/login_page.dart';
 import 'package:pokerpass/register_page.dart';
 import 'package:pokerpass/setting/Setting.dart' as setting;
 import 'package:window_size/window_size.dart';
-
-import 'home_page.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -25,7 +27,7 @@ void main() {
   runApp(MyApp());
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatelessWidget {  
   @override
   Widget build(BuildContext context) {
     return CupertinoApp(
@@ -38,9 +40,12 @@ class MyApp extends StatelessWidget {
         ),
       ),
       routes: {
+        LoginPage.id: (context) => LoginPage(),
         RegisterPage.id: (context) => RegisterPage(),
+        QRCodePage.id: (context) => QRCodePage(),
+        PCPage.id: (context) => PCPage(),
       },
-      home: HomePage(title: 'PokerPass'),
+      home: HomePage(),
     );
   }
 }

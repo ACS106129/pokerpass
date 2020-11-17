@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:pokerpass/setting/Setting.dart' as setting;
+import 'package:pokerpass/utility/area.dart';
 
 class RegisterPage extends StatefulWidget {
   static const String id = 'register_page';
@@ -13,11 +13,14 @@ class _RegisterPageState extends State<RegisterPage> {
   @override
   Widget build(BuildContext context) {
     return CupertinoPageScaffold(
-      navigationBar: CupertinoNavigationBar(
+      navigationBar: const CupertinoNavigationBar(
         previousPageTitle: '返回',
+        middle: Text('註冊'),
       ),
-      child: Center(
-        child: _registerPageContent(context),
+      child: SafeArea(
+        child: Center(
+          child: _registerPageContent(context),
+        ),
       ),
     );
   }
@@ -27,7 +30,7 @@ class _RegisterPageState extends State<RegisterPage> {
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         Container(
-          width: MediaQuery.of(context).size.width * 0.8,
+          width: getSafeArea(context).width * 0.8,
           child: Column(
             children: [
               CupertinoTextField(
@@ -40,7 +43,7 @@ class _RegisterPageState extends State<RegisterPage> {
                 ],
               ),
               SizedBox(
-                height: MediaQuery.of(context).size.height / 15,
+                height: getSafeArea(context).height / 15,
               ),
               CupertinoTextField(
                 obscureText: true,
@@ -53,7 +56,7 @@ class _RegisterPageState extends State<RegisterPage> {
                 ],
               ),
               SizedBox(
-                height: MediaQuery.of(context).size.height / 15,
+                height: getSafeArea(context).height / 15,
               ),
               CupertinoButton(
                 onPressed: () {
