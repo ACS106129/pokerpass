@@ -47,6 +47,9 @@ class _PCPageState extends State<PCPage> {
   }
 
   Widget _pcPageContent(BuildContext context) {
-    return PokerGame(context).widget;
+    return LayoutBuilder(
+      builder: (context, constraints) =>
+          PokerGame(Size(constraints.maxWidth, constraints.maxHeight)).widget,
+    );
   }
 }

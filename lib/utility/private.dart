@@ -1,3 +1,3 @@
 String getDeviceKey(){
-  return null;
+  return '';
 }

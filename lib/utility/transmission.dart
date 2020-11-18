@@ -10,5 +10,5 @@ String getHmacValue(final String serverRandom, final String deviceKey) {
 
 // Get server's session id and random number
 List<String> getServerData(final String url) {
-  return null;
+  return [];
 }
