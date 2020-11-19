@@ -9,30 +9,41 @@ import 'package:qr_flutter/qr_flutter.dart';
 
 class QRCodePage extends StatefulWidget {
   static const id = 'qrcode_page';
-  final String qrString;
-  QRCodePage({Key key, this.qrString = ''}) : super(key: key);
+  QRCodePage({final Key key}) : super(key: key);
   @override
   _QRCodePageState createState() => _QRCodePageState();
 }
 
 class _QRCodePageState extends State<QRCodePage> {
+  String qrMessage;
+
   @override
   Widget build(final BuildContext context) {
-    print(widget.qrString);
-    return CupertinoPageScaffold(
-      navigationBar: const CupertinoNavigationBar(
-        previousPageTitle: '返回',
-        middle: const Text('掃描QRCode'),
-      ),
-      child: SafeArea(
-        child: Center(
-          child: _qrcodePageContent(context),
+    qrMessage = ModalRoute.of(context).settings.arguments;
+    print(qrMessage);
+    return WillPopScope(
+      child: CupertinoPageScaffold(
+        navigationBar: const CupertinoNavigationBar(
+          previousPageTitle: '返回',
+          middle: const Text('掃描QRCode'),
+        ),
+        child: SafeArea(
+          child: Center(
+            child: LayoutBuilder(
+              builder: (context, constraints) => _qrcodePageContent(
+                  context, Size(constraints.maxWidth, constraints.maxHeight)),
+            ),
+          ),
         ),
       ),
+      onWillPop: () async {
+        return true;
+      },
     );
   }
 
-  Widget _qrcodePageContent(final BuildContext context) {
+  Widget _qrcodePageContent(
+      final BuildContext context, final Size contentSize) {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [

@@ -8,7 +8,6 @@ import 'package:pokerpass/page/mode_page.dart';
 import 'package:pokerpass/page/register_page.dart';
 import 'package:pokerpass/page/setting_page.dart';
 import 'package:pokerpass/setting/setting.dart' as setting;
-import 'package:pokerpass/setting/user.dart';
 
 class HomePage extends StatefulWidget {
   static const id = '/';
@@ -18,25 +17,22 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  final iconColor = CupertinoDynamicColor.withBrightness(
-    color: Colors.blue.shade600,
-    darkColor: Colors.blue.shade300,
-  );
-  final placeholderColor = CupertinoDynamicColor.withBrightness(
-      color: CupertinoColors.placeholderText, darkColor: Colors.white70);
-  final urlController = TextEditingController(text: UserCache.homeURLText);
-  final userController = TextEditingController(text: UserCache.homeUserText);
+  final urlController = TextEditingController(text: urlText);
+  final userController = TextEditingController(text: userText);
   final urlFocusNode = FocusNode();
   final userFocusNode = FocusNode();
+  static var urlText = '';
+  static var userText = '';
   Color userColor;
 
   @override
   void initState() {
     super.initState();
+    userColor = CupertinoColors.placeholderText;
     userFocusNode.addListener(() {
       if (userFocusNode.hasFocus) {
         setState(() {
-          userColor = CupertinoDynamicColor.resolve(iconColor, context);
+          userColor = CupertinoDynamicColor.resolve(setting.iconColor, context);
         });
       } else {
         setState(() {
@@ -48,6 +44,8 @@ class _HomePageState extends State<HomePage> {
 
   @override
   void dispose() {
+    urlController.dispose();
+    userController.dispose();
     urlFocusNode.dispose();
     userFocusNode.dispose();
     super.dispose();
@@ -55,19 +53,38 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(final BuildContext context) {
-    userColor = CupertinoColors.placeholderText;
-    return CupertinoPageScaffold(
-      navigationBar: const CupertinoNavigationBar(
-        middle: const Text('撲克牌通行碼認證系統'),
-      ),
-      child: SafeArea(
-        child: Center(
-          child: LayoutBuilder(
-            builder: (context, constraints) => homePageContent(
-                context, Size(constraints.maxWidth, constraints.maxHeight)),
+    return WillPopScope(
+      child: CupertinoPageScaffold(
+        navigationBar: const CupertinoNavigationBar(
+          middle: const Text('PokerPass'),
+        ),
+        child: SafeArea(
+          child: Center(
+            child: LayoutBuilder(
+              builder: (context, constraints) => homePageContent(
+                  context, Size(constraints.maxWidth, constraints.maxHeight)),
+            ),
           ),
         ),
       ),
+      onWillPop: () async {
+        return await showCupertinoDialog(
+          context: context,
+          builder: (context) => CupertinoAlertDialog(
+            content: const Text('結束程式?'),
+            actions: [
+              CupertinoDialogAction(
+                child: const Text('取消'),
+                onPressed: () => Navigator.pop(context, false),
+              ),
+              CupertinoDialogAction(
+                child: const Text('結束'),
+                onPressed: () => Navigator.pop(context, true),
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 
@@ -99,35 +116,37 @@ class _HomePageState extends State<HomePage> {
           ),
           SizedBox(height: contentSize.height / 10),
           CupertinoButton(
+            child: const Text('建立Session連線'),
+            color: CupertinoDynamicColor.withBrightness(
+              color: Colors.blue.shade600,
+              darkColor: Colors.blue.shade300,
+            ),
             onPressed: () async {
-              if (!setting.urlRegex.hasMatch(UserCache.homeURLText)) {
+              if (!setting.urlRegex.hasMatch(urlController.text)) {
                 BotToast.showText(text: '網址格式錯誤!');
                 return;
               }
-              if (!setting.userRegex.hasMatch(UserCache.homeUserText)) {
+              if (!setting.userRegex.hasMatch(userController.text)) {
                 BotToast.showText(text: '使用者格式錯誤!');
                 return;
               }
               // request url connect async value
               BotToast.showLoading(
-                allowClick: true,
-                backButtonBehavior: BackButtonBehavior.close,
                 animationDuration: Duration(milliseconds: 200),
                 animationReverseDuration: Duration(milliseconds: 200),
+                backButtonBehavior: BackButtonBehavior.none,
+                backgroundColor: CupertinoDynamicColor.resolve(
+                    setting.loadingColor, context),
                 duration: Duration(milliseconds: 800),
                 onClose: () => WidgetsBinding.instance.addPostFrameCallback(
                   (_) async {
                     // await login complete and get value
-                    Navigator.pushNamed(context, ModePage.id);
+
+                    var result = await updateAndPush(context, ModePage.id);
                   },
                 ),
               );
             },
-            child: const Text('登入'),
-            color: CupertinoDynamicColor.withBrightness(
-              color: Colors.blue.shade600,
-              darkColor: Colors.blue.shade300,
-            ),
             padding: EdgeInsets.symmetric(
               vertical: contentSize.width / 30,
             ),
@@ -137,14 +156,14 @@ class _HomePageState extends State<HomePage> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               CupertinoButton(
-                onPressed: () {
-                  Navigator.pushNamed(context, SettingPage.id);
-                },
                 child: const Text('設定'),
                 color: CupertinoDynamicColor.withBrightness(
                   color: Colors.yellow.shade600,
                   darkColor: Colors.yellow.shade300,
                 ),
+                onPressed: () async {
+                  var result = await updateAndPush(context, SettingPage.id);
+                },
                 padding: EdgeInsets.symmetric(
                   horizontal: contentSize.width / 10,
                   vertical: contentSize.width / 30,
@@ -152,14 +171,18 @@ class _HomePageState extends State<HomePage> {
               ),
               SizedBox(width: contentSize.width / 20),
               CupertinoButton(
-                onPressed: () {
-                  Navigator.pushNamed(context, RegisterPage.id);
-                },
                 child: const Text('註冊'),
                 color: CupertinoDynamicColor.withBrightness(
                   color: Colors.black54,
                   darkColor: Colors.white70,
                 ),
+                onPressed: () async {
+                  var result = await updateAndPush(context, RegisterPage.id);
+                  if (result is List && result.length >= 2) {
+                    urlController.text = result.first ?? '';
+                    userController.text = result.elementAt(1) ?? '';
+                  }
+                },
                 padding: EdgeInsets.symmetric(
                   horizontal: contentSize.width / 10,
                   vertical: contentSize.width / 30,
@@ -172,6 +195,16 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
+  // update current state and push to next route
+  Future<Object> updateAndPush(final BuildContext context, final String id,
+      {Object arguments}) async {
+    urlText = urlController.text;
+    userText = userController.text;
+    urlFocusNode.unfocus();
+    userFocusNode.unfocus();
+    return await Navigator.pushNamed(context, id, arguments: arguments);
+  }
+
   CupertinoTextField cupertinoTextField(
       final String label,
       final String placeholder,
@@ -180,7 +213,17 @@ class _HomePageState extends State<HomePage> {
       final RegExp inputRegExp,
       final FocusNode node) {
     return CupertinoTextField(
-      cursorColor: CupertinoDynamicColor.resolve(iconColor, context),
+      controller: (() {
+        switch (label) {
+          case setting.urlLabel:
+            return urlController;
+          case setting.userLabel:
+            return userController;
+          default:
+            throw new Exception('Label $label Error!');
+        }
+      })(),
+      cursorColor: CupertinoDynamicColor.resolve(setting.iconColor, context),
       decoration: BoxDecoration(
         border: Border.all(
           color: CupertinoColors.placeholderText,
@@ -192,7 +235,7 @@ class _HomePageState extends State<HomePage> {
       prefix: Icon(
         icon,
         semanticLabel: label,
-        color: CupertinoDynamicColor.resolve(iconColor, context),
+        color: CupertinoDynamicColor.resolve(setting.iconColor, context),
       ),
       inputFormatters: [
         FilteringTextInputFormatter(
@@ -204,22 +247,10 @@ class _HomePageState extends State<HomePage> {
       onTap: () {
         // focus change border color
       },
-      onChanged: (str) {
-        switch (label) {
-          case setting.userLabel:
-            UserCache.homeUserText = str;
-            break;
-          case setting.urlLabel:
-            UserCache.homeURLText = str;
-            break;
-          default:
-            throw new Exception('Label $str Error!');
-        }
-      },
       placeholder: placeholder,
       placeholderStyle: TextStyle(
         fontWeight: FontWeight.w400,
-        color: CupertinoDynamicColor.resolve(placeholderColor, context),
+        color: CupertinoDynamicColor.resolve(setting.placeholderColor, context),
       ),
       style: TextStyle(
         height: 1.5,

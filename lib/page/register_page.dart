@@ -3,7 +3,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:pokerpass/setting/setting.dart' as setting;
-import 'package:pokerpass/setting/user.dart';
 
 class RegisterPage extends StatefulWidget {
   static const id = 'register_page';
@@ -13,35 +12,18 @@ class RegisterPage extends StatefulWidget {
 }
 
 class _RegisterPageState extends State<RegisterPage> {
-  final promptTextColor = CupertinoDynamicColor.withBrightness(
-    color: CupertinoColors.black,
-    darkColor: CupertinoColors.white,
-  );
-  final loadingColor = CupertinoDynamicColor.withBrightness(
-    color: Colors.black26,
-    darkColor: Colors.white10,
-  );
-  final placeholderColor = CupertinoDynamicColor.withBrightness(
-      color: CupertinoColors.placeholderText, darkColor: Colors.white70);
-  final urlController = TextEditingController(text: UserCache.registerURLText);
-  final userController =
-      TextEditingController(text: UserCache.registerUserText);
-  final passwordController =
-      TextEditingController(text: UserCache.registerPasswordText);
+  final urlController = TextEditingController(text: urlText);
+  final userController = TextEditingController(text: userText);
+  final passwordController = TextEditingController(text: '');
   final urlFocusNode = FocusNode(debugLabel: setting.urlLabel);
   final userFocusNode = FocusNode(debugLabel: setting.userLabel);
   final passwordFocusNode = FocusNode(debugLabel: setting.passwordLabel);
-
-  @override
-  void initState() {
-    super.initState();
-  }
+  static var urlText = '';
+  static var userText = '';
 
   @override
   void dispose() {
-    UserCache.registerURLText = urlController.text;
-    // password must be clear
-    UserCache.registerPasswordText = '';
+    urlText = urlController.text;
     urlController.dispose();
     userController.dispose();
     passwordController.dispose();
@@ -53,74 +35,75 @@ class _RegisterPageState extends State<RegisterPage> {
 
   @override
   Widget build(final BuildContext context) {
-    return CupertinoPageScaffold(
-      navigationBar: CupertinoNavigationBar(
-        automaticallyImplyLeading: false,
-        leading: CupertinoNavigationBarBackButton(
+    return WillPopScope(
+      child: CupertinoPageScaffold(
+        navigationBar: CupertinoNavigationBar(
           previousPageTitle: '返回',
-          onPressed: () async {
-            // save user id to register cache
-            UserCache.registerUserText = userController.text;
-            Navigator.pop(context);
-          },
+          middle: const Text('註冊'),
+          trailing: GestureDetector(
+            child: Text(
+              '送出',
+              style: TextStyle(
+                color: CupertinoDynamicColor.resolve(
+                    CupertinoColors.activeGreen, context),
+              ),
+            ),
+            onTap: () async {
+              if (!setting.urlRegex.hasMatch(urlController.text)) {
+                BotToast.showText(text: '網址格式錯誤');
+                return;
+              }
+              if (!setting.userRegex.hasMatch(userController.text)) {
+                BotToast.showText(text: '使用者格式錯誤');
+                return;
+              }
+              if (!setting.passwordRegex.hasMatch(passwordController.text)) {
+                BotToast.showText(text: '通行碼格式錯誤');
+                return;
+              }
+              // cancel keyboard input
+              urlFocusNode.unfocus();
+              userFocusNode.unfocus();
+              passwordFocusNode.unfocus();
+              BotToast.showLoading(
+                animationDuration: Duration(milliseconds: 250),
+                animationReverseDuration: Duration(milliseconds: 250),
+                backButtonBehavior: BackButtonBehavior.none,
+                backgroundColor: CupertinoDynamicColor.resolve(
+                    setting.loadingColor, context),
+                duration: Duration(milliseconds: 700),
+                onClose: () => WidgetsBinding.instance.addPostFrameCallback(
+                  (_) async {
+                    // await submit complete and get value
+
+                    // save devices key in device
+
+                    // erase register user id
+                    userText = '';
+                    // give url and user id to login
+                    Navigator.pop(
+                        context, [urlController.text, userController.text]);
+                  },
+                ),
+              );
+              // submit user id and password to server through url to get devices key
+            },
+          ),
         ),
-        middle: const Text('註冊'),
-        trailing: GestureDetector(
-          child: Text(
-            '送出',
-            style: TextStyle(
-              color: CupertinoDynamicColor.resolve(
-                  CupertinoColors.activeGreen, context),
+        child: SafeArea(
+          child: Center(
+            child: LayoutBuilder(
+              builder: (context, constraints) => registerPageContent(
+                  context, Size(constraints.maxWidth, constraints.maxHeight)),
             ),
           ),
-          onTap: () async {
-            if (!setting.urlRegex.hasMatch(urlController.text)) {
-              BotToast.showText(text: '網址格式錯誤');
-              return;
-            }
-            if (!setting.userRegex.hasMatch(userController.text)) {
-              BotToast.showText(text: '使用者格式錯誤');
-              return;
-            }
-            if (!setting.passwordRegex.hasMatch(passwordController.text)) {
-              BotToast.showText(text: '通行碼格式錯誤');
-              return;
-            }
-            // cancel keyboard input
-            urlFocusNode.unfocus();
-            userFocusNode.unfocus();
-            passwordFocusNode.unfocus();
-            BotToast.showLoading(
-              animationDuration: Duration(milliseconds: 250),
-              animationReverseDuration: Duration(milliseconds: 250),
-              backButtonBehavior: BackButtonBehavior.none,
-              backgroundColor:
-                  CupertinoDynamicColor.resolve(loadingColor, context),
-              duration: Duration(milliseconds: 700),
-              onClose: () => WidgetsBinding.instance.addPostFrameCallback(
-                (_) async {
-                  // await submit complete and get value
-                  // give user id to login
-                  UserCache.homeURLText = urlController.text;
-                  UserCache.homeUserText = userController.text;
-                  // erase register user id
-                  UserCache.registerUserText = '';
-                  Navigator.pop(context);
-                },
-              ),
-            );
-            // submit user id and password to server through url
-          },
         ),
       ),
-      child: SafeArea(
-        child: Center(
-          child: LayoutBuilder(
-            builder: (context, constraints) => registerPageContent(
-                context, Size(constraints.maxWidth, constraints.maxHeight)),
-          ),
-        ),
-      ),
+      onWillPop: () async {
+        // save user id to register cache
+        userText = userController.text;
+        return true;
+      },
     );
   }
 
@@ -208,13 +191,14 @@ class _RegisterPageState extends State<RegisterPage> {
       prefix: Text(
         prompt,
         style: TextStyle(
-          color: CupertinoDynamicColor.resolve(promptTextColor, context),
+          color:
+              CupertinoDynamicColor.resolve(setting.promptTextColor, context),
         ),
       ),
       placeholder: placeholder,
       placeholderStyle: TextStyle(
         fontWeight: FontWeight.w400,
-        color: CupertinoDynamicColor.resolve(placeholderColor, context),
+        color: CupertinoDynamicColor.resolve(setting.placeholderColor, context),
       ),
       style: TextStyle(
         height: 1.5,
