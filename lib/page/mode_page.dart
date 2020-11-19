@@ -81,92 +81,83 @@ class _ModePageState extends State<ModePage> {
   }
 
   Widget modePageContent(final BuildContext context, final Size contentSize) {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        Container(
-          width: getSafeArea(context).width * 0.7,
-          child: Column(
-            children: [
-              // PokerPC or PokerGO mode
-              setting.isDesktop
-                  ? CupertinoButton(
-                      onPressed: () async {
-                        // server number, session id and client number
-                        var result =
-                            await Navigator.pushNamed(context, PCPage.id);
-                      },
-                      child: Text(
-                        'PC',
-                        style: TextStyle(fontSize: 20),
-                      ),
-                      color: Colors.blue,
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 120,
-                        vertical: 20,
-                      ),
-                    )
-                  : CupertinoButton(
-                      onPressed: () {},
-                      child: Text(
-                        'GO',
-                        style: TextStyle(fontSize: 20),
-                      ),
-                      color: Colors.blue,
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 120,
-                        vertical: 20,
-                      ),
-                    ),
-              SizedBox(
-                height: getSafeArea(context).height / 15,
-              ),
-              // Poker2FA mode
-              CupertinoButton(
-                onPressed: () async {
-                  if (!setting.isDesktop) {
-                    if (await Permission.camera.status.isGranted) {
-                      var result = await Navigator.pushNamed(
-                          context, QRCodePage.id,
-                          arguments: await scan());
-                    } else {
-                      await showCupertinoDialog(
-                        context: context,
-                        builder: (context) => CupertinoAlertDialog(
-                          title: Text('相機權限要求'),
-                          content: Text('該應用需要相機進行QRCode掃描'),
-                          actions: [
-                            CupertinoDialogAction(
-                              child: Text('取消'),
-                              onPressed: () => Navigator.pop(context),
-                            ),
-                            CupertinoDialogAction(
-                              child: Text('設定'),
-                              onPressed: () => openAppSettings(),
-                            ),
-                          ],
-                        ),
-                      );
-                    }
-                  } else {
-                    var result =
-                        await Navigator.pushNamed(context, QRCodePage.id);
-                  }
-                },
-                child: Text(
-                  '2FA By QRCODE',
-                  style: TextStyle(fontSize: 20),
+    return Container(
+      width: getSafeArea(context).width * 0.7,
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          // PokerPC or PokerGO mode
+          setting.isDesktop
+              ? CupertinoButton(
+                  child: Text(
+                    'PokerPC',
+                    style: TextStyle(fontSize: 28),
+                  ),
+                  color: CupertinoColors.activeGreen,
+                  onPressed: () async {
+                    // server number, session id and client number
+                    var result = await Navigator.pushNamed(context, PCPage.id);
+                  },
+                  padding: EdgeInsets.symmetric(
+                    vertical: contentSize.height / 20,
+                  ),
+                )
+              : CupertinoButton(
+                  child: Text(
+                    'PokerGO',
+                    style: TextStyle(fontSize: 28),
+                  ),
+                  color: CupertinoColors.activeGreen,
+                  onPressed: () async {},
+                  padding: EdgeInsets.symmetric(
+                    vertical: contentSize.height / 20,
+                  ),
                 ),
-                color: Colors.blue,
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 65,
-                  vertical: 20,
-                ),
-              ),
-            ],
+          SizedBox(
+            height: getSafeArea(context).height / 7,
           ),
-        ),
-      ],
+          // Poker2FA mode
+          CupertinoButton(
+            child: Text(
+              'Poker2FA',
+              style: TextStyle(fontSize: 28),
+            ),
+            color: CupertinoColors.activeGreen,
+            onPressed: () async {
+              if (!setting.isDesktop) {
+                if (await Permission.camera.status.isGranted) {
+                  var result = await Navigator.pushNamed(context, QRCodePage.id,
+                      arguments: await scan());
+                } else {
+                  await showCupertinoDialog(
+                    context: context,
+                    builder: (context) => CupertinoAlertDialog(
+                      title: Text('相機權限要求'),
+                      content: Text('該應用需要相機進行QRCode掃描'),
+                      actions: [
+                        CupertinoDialogAction(
+                          child: Text('取消'),
+                          onPressed: () => Navigator.pop(context),
+                        ),
+                        CupertinoDialogAction(
+                          child: Text('設定'),
+                          onPressed: () => openAppSettings(),
+                        ),
+                      ],
+                    ),
+                  );
+                }
+              } else {
+                var result = await Navigator.pushNamed(context, QRCodePage.id);
+              }
+            },
+            padding: EdgeInsets.symmetric(
+              vertical: contentSize.height / 20,
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
