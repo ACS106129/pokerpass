@@ -5,7 +5,7 @@ import 'package:crypto/crypto.dart';
 
 String getHmacValue(final String serverRandom, final String deviceKey) {
   final byteKey = utf8.encode(deviceKey);
-  final hmac256 = new Hmac(sha256, byteKey);
+  final hmac256 = Hmac(sha256, byteKey);
   return '${hmac256.convert(utf8.encode(serverRandom))}';
 }
 

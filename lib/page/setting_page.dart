@@ -1,26 +1,30 @@
 import 'package:flutter/cupertino.dart';
 
 class SettingPage extends StatefulWidget {
-  static const String id = 'setting_page';
+  static const id = 'setting_page';
+  SettingPage({final Key key}) : super(key: key);
   @override
   _SettingPageState createState() => _SettingPageState();
 }
 
 class _SettingPageState extends State<SettingPage> {
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     return CupertinoPageScaffold(
       navigationBar: CupertinoNavigationBar(
         previousPageTitle: '取消',
         middle: const Text('設定'),
         trailing: GestureDetector(
-          onTap: () async {
-            // finish configuration
+          onTap: () {
+            // finish user configuration
             Navigator.pop(context);
           },
-          child: const Text(
+          child: Text(
             '完成',
-            style: TextStyle(color: CupertinoColors.systemBlue),
+            style: TextStyle(
+              color: CupertinoDynamicColor.resolve(
+                  CupertinoColors.activeGreen, context),
+            ),
           ),
         ),
       ),

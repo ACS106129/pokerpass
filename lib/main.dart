@@ -9,7 +9,7 @@ import 'package:pokerpass/page/home_page.dart';
 import 'package:pokerpass/page/mode_page.dart';
 import 'package:pokerpass/page/register_page.dart';
 import 'package:pokerpass/page/setting_page.dart';
-import 'package:pokerpass/setting/Setting.dart' as setting;
+import 'package:pokerpass/setting/setting.dart' as setting;
 import 'package:window_size/window_size.dart';
 
 void main() async {
@@ -29,9 +29,9 @@ void main() async {
 
 class MyApp extends StatelessWidget {
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     return CupertinoApp(
-      title: 'PokerPass System',
+      title: 'PokerPass',
       theme: CupertinoThemeData(
         brightness: setting.DebugConfig.brightness,
         scaffoldBackgroundColor: CupertinoDynamicColor.withBrightness(

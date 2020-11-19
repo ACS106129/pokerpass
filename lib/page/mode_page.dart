@@ -3,19 +3,20 @@ import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:pokerpass/page/2FA/qrcode_page.dart';
 import 'package:pokerpass/page/PC/pc_page.dart';
-import 'package:pokerpass/setting/Setting.dart' as setting;
+import 'package:pokerpass/setting/setting.dart' as setting;
 import 'package:pokerpass/utility/area.dart';
 import 'package:qrscan/qrscan.dart';
 
 class ModePage extends StatefulWidget {
   static const String id = 'login_page';
+  ModePage({final Key key}) : super(key: key);
   @override
   _ModePageState createState() => _ModePageState();
 }
 
 class _ModePageState extends State<ModePage> {
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     return CupertinoPageScaffold(
       navigationBar: const CupertinoNavigationBar(
         previousPageTitle: '返回',
@@ -23,18 +24,21 @@ class _ModePageState extends State<ModePage> {
       ),
       child: SafeArea(
         child: Center(
-          child: _ModePageContent(context),
+          child: LayoutBuilder(
+            builder: (context, constraints) => modePageContent(
+                context, Size(constraints.maxWidth, constraints.maxHeight),),
+          ),
         ),
       ),
     );
   }
 
-  Widget _ModePageContent(BuildContext context) {
+  Widget modePageContent(final BuildContext context, final Size contentSize) {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         Container(
-          width: getSafeArea(context).width * 0.8,
+          width: getSafeArea(context).width * 0.7,
           child: Column(
             children: [
               // PokerPC or PokerGO mode
@@ -42,7 +46,6 @@ class _ModePageState extends State<ModePage> {
                   ? CupertinoButton(
                       onPressed: () {
                         // server number, session id and client number
-                        
                         Navigator.pushNamed(context, PCPage.id);
                       },
                       child: Text(

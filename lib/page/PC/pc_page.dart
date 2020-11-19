@@ -4,6 +4,7 @@ import 'package:pokerpass/poker/poker.dart';
 
 class PCPage extends StatefulWidget {
   static const String id = 'pc_page';
+  PCPage({Key key}) : super(key: key);
   @override
   _PCPageState createState() => _PCPageState();
 }
@@ -25,7 +26,7 @@ class _PCPageState extends State<PCPage> {
                 content: const Text('確定要中止PokerPC模式?'),
                 actions: [
                   CupertinoDialogAction(
-                    child: const Text('返回'),
+                    child: const Text('取消'),
                     onPressed: () => Navigator.pop(context),
                   ),
                   CupertinoDialogAction(
@@ -46,7 +47,7 @@ class _PCPageState extends State<PCPage> {
     );
   }
 
-  Widget _pcPageContent(BuildContext context) {
+  Widget _pcPageContent(final BuildContext context) {
     return LayoutBuilder(
       builder: (context, constraints) =>
           PokerGame(Size(constraints.maxWidth, constraints.maxHeight)).widget,

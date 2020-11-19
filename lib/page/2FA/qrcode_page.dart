@@ -2,23 +2,23 @@ import 'dart:math';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:pokerpass/setting/setting.dart' as setting;
 import 'package:pokerpass/utility/area.dart';
 import 'package:pokerpass/utility/transmission.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 
-import 'package:pokerpass/setting/Setting.dart' as setting;
-
 class QRCodePage extends StatefulWidget {
-  static const String id = 'qrcode_page';
+  static const id = 'qrcode_page';
   final String qrString;
-  QRCodePage({this.qrString = ''});
+  QRCodePage({Key key, this.qrString = ''}) : super(key: key);
   @override
   _QRCodePageState createState() => _QRCodePageState();
 }
 
 class _QRCodePageState extends State<QRCodePage> {
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
+    print(widget.qrString);
     return CupertinoPageScaffold(
       navigationBar: const CupertinoNavigationBar(
         previousPageTitle: '返回',
@@ -32,7 +32,7 @@ class _QRCodePageState extends State<QRCodePage> {
     );
   }
 
-  Widget _qrcodePageContent(BuildContext context) {
+  Widget _qrcodePageContent(final BuildContext context) {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
