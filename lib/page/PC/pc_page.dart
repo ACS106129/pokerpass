@@ -1,5 +1,5 @@
 import 'package:flutter/cupertino.dart';
-import 'package:pokerpass/login_page.dart';
+import 'package:pokerpass/page/mode_page.dart';
 import 'package:pokerpass/poker/poker.dart';
 
 class PCPage extends StatefulWidget {
@@ -31,7 +31,7 @@ class _PCPageState extends State<PCPage> {
                   CupertinoDialogAction(
                     child: const Text('中止'),
                     onPressed: () => Navigator.popUntil(
-                        context, ModalRoute.withName(LoginPage.id)),
+                        context, ModalRoute.withName(ModePage.id)),
                   ),
                 ],
               ),

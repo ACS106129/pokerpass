@@ -1,19 +1,19 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:pokerpass/2FA/qrcode_page.dart';
-import 'package:pokerpass/PC/pc_page.dart';
+import 'package:pokerpass/page/2FA/qrcode_page.dart';
+import 'package:pokerpass/page/PC/pc_page.dart';
 import 'package:pokerpass/setting/Setting.dart' as setting;
 import 'package:pokerpass/utility/area.dart';
 import 'package:qrscan/qrscan.dart';
 
-class LoginPage extends StatefulWidget {
+class ModePage extends StatefulWidget {
   static const String id = 'login_page';
   @override
-  _LoginPageState createState() => _LoginPageState();
+  _ModePageState createState() => _ModePageState();
 }
 
-class _LoginPageState extends State<LoginPage> {
+class _ModePageState extends State<ModePage> {
   @override
   Widget build(BuildContext context) {
     return CupertinoPageScaffold(
@@ -23,13 +23,13 @@ class _LoginPageState extends State<LoginPage> {
       ),
       child: SafeArea(
         child: Center(
-          child: _loginPageContent(context),
+          child: _ModePageContent(context),
         ),
       ),
     );
   }
 
-  Widget _loginPageContent(BuildContext context) {
+  Widget _ModePageContent(BuildContext context) {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
@@ -42,6 +42,7 @@ class _LoginPageState extends State<LoginPage> {
                   ? CupertinoButton(
                       onPressed: () {
                         // server number, session id and client number
+                        
                         Navigator.pushNamed(context, PCPage.id);
                       },
                       child: Text(
