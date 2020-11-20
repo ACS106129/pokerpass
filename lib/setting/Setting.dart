@@ -8,6 +8,7 @@ const width = 800.0;
 const userLabel = 'user';
 const urlLabel = 'url';
 const passwordLabel = 'pw';
+const themeLabel = 'theme';
 final isDesktop = Platform.isWindows || Platform.isMacOS || Platform.isLinux;
 // regular expression check when inputting
 final userInputRegex = RegExp(r'^[a-zA-Z0-9]{0,20}');

@@ -1,4 +1,6 @@
 import 'package:flutter/cupertino.dart';
+import 'package:pokerpass/setting/setting.dart' as setting;
+import 'package:settings_ui/settings_ui.dart';
 
 class SettingPage extends StatefulWidget {
   static const id = 'setting_page';
@@ -32,7 +34,7 @@ class _SettingPageState extends State<SettingPage> {
         child: SafeArea(
           child: Center(
             child: LayoutBuilder(
-              builder: (context, constraints) => _settingPageContent(
+              builder: (context, constraints) => settingPageContent(
                   context, Size(constraints.maxWidth, constraints.maxHeight)),
             ),
           ),
@@ -44,7 +46,29 @@ class _SettingPageState extends State<SettingPage> {
     );
   }
 
-  Widget _settingPageContent(final BuildContext context, final Size size) {
-    return Container();
+  Widget settingPageContent(final BuildContext context, final Size size) {
+    return Container(
+      child: SettingsList(
+        sections: [
+          SettingsSection(
+            title: '主題',
+            titleTextStyle: TextStyle(color: CupertinoDynamicColor.resolve(CupertinoColors.systemBackground, context)),
+            tiles: [
+              /*SettingsTile.switchTile(
+                title: '深色主題',
+                leading: Icon(
+                  CupertinoIcons.photo,
+                  semanticLabel: setting.themeLabel,
+                  color:
+                      CupertinoDynamicColor.resolve(setting.iconColor, context),
+                ),
+                onToggle: (value) {},
+                switchValue: false,
+              ),*/
+            ],
+          ),
+        ],
+      ),
+    );
   }
 }

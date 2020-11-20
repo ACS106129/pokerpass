@@ -20,7 +20,6 @@ class _QRCodePageState extends State<QRCodePage> {
   @override
   Widget build(final BuildContext context) {
     qrMessage = ModalRoute.of(context).settings.arguments;
-    print(qrMessage);
     return WillPopScope(
       child: CupertinoPageScaffold(
         navigationBar: const CupertinoNavigationBar(
