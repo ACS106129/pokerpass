@@ -1,3 +1,4 @@
+import 'package:flame/flame.dart';
 import 'package:flame/position.dart';
 import 'package:flame/sprite.dart';
 import 'package:flutter/cupertino.dart';
@@ -11,6 +12,8 @@ class CharBlock {
   final Suit lowerSuit;
   Sprite upperSuitSprite;
   Sprite lowerSuitSprite;
+  TextSpan upperCharTextSpan;
+  TextSpan lowerCharTextSpan;
   Position position;
   Size size;
 
@@ -25,31 +28,54 @@ class CharBlock {
     @required double height,
   })  : position = Position(x, y),
         size = Size(width, height) {
-    upperSuitSprite = Sprite(toFileString(upperSuit),
-        x: x + width / 4,
-        y: y - height / 4,
-        width: width / 2.5,
-        height: height / 2.5);
-    lowerSuitSprite = Sprite(toFileString(lowerSuit),
-        x: x + width / 4,
-        y: y - height / 4,
-        width: width / 2.5,
-        height: height / 2.5);
+    upperSuitSprite = Sprite.fromImage(
+        Flame.images.loadedFiles[toImagePath(upperSuit)].loadedImage);
+    lowerSuitSprite = Sprite.fromImage(
+        Flame.images.loadedFiles[toImagePath(lowerSuit)].loadedImage);
+    upperCharTextSpan = TextSpan(
+        text: upperChar,
+        style: TextStyle(
+          color: Colors.black,
+          fontSize: 18,
+          fontWeight: FontWeight.bold,
+        ));
+    lowerCharTextSpan = TextSpan(
+        text: lowerChar,
+        style: TextStyle(
+          color: Colors.black,
+          fontSize: 18,
+          fontWeight: FontWeight.bold,
+        ));
   }
 
   void render(final Canvas canvas) {
-    final paint = Paint();
+    final paint = Paint()..color = Colors.black;
     // card frame
-    final Rect bgRect =
+    final cardRect =
         Rect.fromLTWH(position.x, position.y, size.width, size.height);
-    paint.color = Colors.black;
-    canvas.drawRect(bgRect.inflate(1), paint);
+    canvas.drawRect(cardRect.inflate(1), paint);
     paint.color = Colors.white;
-    canvas.drawRect(bgRect, paint);
+    canvas.drawRect(cardRect, paint);
     // two suits and two char
-    if (upperSuitSprite?.loaded() ?? false) {
-      upperSuitSprite.render(canvas);
-    }
-    if (lowerSuitSprite?.loaded() ?? false) lowerSuitSprite.render(canvas);
+    upperSuitSprite.renderPosition(
+        canvas, Position(size.width / 25, size.height / 25).add(position),
+        size: Position(size.width / 2.5, size.height / 2.5));
+    lowerSuitSprite.renderPosition(
+        canvas, Position(size.width / 25, size.height * 0.56).add(position),
+        size: Position(size.width / 2.5, size.height / 2.5));
+    final textPainter = TextPainter(
+        text: upperCharTextSpan,
+        textAlign: TextAlign.justify,
+        textDirection: TextDirection.ltr);
+    textPainter.layout();
+    textPainter.paint(canvas,
+        Position(size.width * 0.57, size.height / 27).add(position).toOffset());
+    textPainter.text = lowerCharTextSpan;
+    textPainter.layout();
+    textPainter.paint(
+        canvas,
+        Position(size.width * 0.58, size.height * 0.5)
+            .add(position)
+            .toOffset());
   }
 }

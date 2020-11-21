@@ -5,7 +5,7 @@ enum Suit {
   Club,
 }
 
-String toFileString(final Suit suit) {
+String toImagePath(final Suit suit) {
   switch (suit) {
     case Suit.Spade:
       return 'spade.png';
