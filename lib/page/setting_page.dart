@@ -1,5 +1,8 @@
 import 'package:flutter/cupertino.dart';
-import 'package:settings_ui/settings_ui.dart';
+import 'package:flutter/material.dart';
+import 'package:pokerpass/setting/setting.dart' as setting;
+import 'package:pokerpass/setting/user.dart';
+import 'package:pokerpass/utility/cupertino_swith_list_tile.dart';
 
 class SettingPage extends StatefulWidget {
   static const id = 'setting_page';
@@ -9,6 +12,9 @@ class SettingPage extends StatefulWidget {
 }
 
 class _SettingPageState extends State<SettingPage> {
+  var isDarkThemeModeTemp = UserData.snapshot.data == Brightness.dark;
+  var isSystemThemeModeTemp = UserData.isSystemThemeMode;
+
   @override
   Widget build(final BuildContext context) {
     return WillPopScope(
@@ -19,6 +25,7 @@ class _SettingPageState extends State<SettingPage> {
           trailing: GestureDetector(
             onTap: () {
               // finish user configuration
+              UserData.isSystemThemeMode = isSystemThemeModeTemp;
               Navigator.pop(context, '已保存');
             },
             child: Text(
@@ -40,31 +47,71 @@ class _SettingPageState extends State<SettingPage> {
         ),
       ),
       onWillPop: () async {
+        UserData.brightness.add(UserData.isSystemThemeMode
+            ? setting.platformBrightness
+            : isDarkThemeModeTemp
+                ? Brightness.dark
+                : Brightness.light);
         return true;
       },
     );
   }
 
   Widget settingPageContent(final BuildContext context, final Size size) {
-    return Container(
-      child: SettingsList(
-        sections: [
-          SettingsSection(
-            title: '主題',
-            titleTextStyle: TextStyle(color: CupertinoDynamicColor.resolve(CupertinoColors.systemBackground, context)),
-            tiles: [
-              /*SettingsTile.switchTile(
-                title: '深色主題',
-                leading: Icon(
+    return Scaffold(
+      backgroundColor: CupertinoDynamicColor.resolve(setting.bgColor, context),
+      body: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Container(
+            child: Row(
+              children: [
+                Icon(
                   CupertinoIcons.photo,
                   semanticLabel: setting.themeLabel,
                   color:
                       CupertinoDynamicColor.resolve(setting.iconColor, context),
                 ),
-                onToggle: (value) {},
-                switchValue: false,
-              ),*/
-            ],
+                Text(
+                  '主題',
+                  style: TextStyle(
+                    fontSize: 26,
+                    fontWeight: FontWeight.w500,
+                    color: CupertinoDynamicColor.resolve(
+                        setting.promptTextColor, context),
+                  ),
+                ),
+              ],
+            ),
+            padding: EdgeInsets.all(15),
+            decoration: BoxDecoration(
+                border: Border(bottom: BorderSide(color: Colors.black26))),
+          ),
+          CupertinoSwitchListTile(
+            title: Text('根據系統主題',
+                style: TextStyle(
+                  color: CupertinoDynamicColor.resolve(
+                      setting.promptTextColor, context),
+                )),
+            onChanged: (value) {
+              if (value) UserData.brightness.add(setting.platformBrightness);
+              setState(() => isSystemThemeModeTemp = value);
+            },
+            value: isSystemThemeModeTemp,
+          ),
+          CupertinoSwitchListTile(
+            title: Text(
+              '深色主題',
+              style: TextStyle(
+                color: CupertinoDynamicColor.resolve(
+                    setting.promptTextColor, context),
+              ),
+            ),
+            onChanged: !isSystemThemeModeTemp
+                ? (value) => UserData.brightness
+                    .add(value ? Brightness.dark : Brightness.light)
+                : null,
+            value: UserData.snapshot.data == Brightness.dark,
           ),
         ],
       ),

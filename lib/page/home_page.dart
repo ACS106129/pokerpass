@@ -8,6 +8,7 @@ import 'package:pokerpass/page/mode_page.dart';
 import 'package:pokerpass/page/register_page.dart';
 import 'package:pokerpass/page/setting_page.dart';
 import 'package:pokerpass/setting/setting.dart' as setting;
+import 'package:pokerpass/setting/user.dart';
 
 class HomePage extends StatefulWidget {
   static const id = '/';
@@ -23,23 +24,16 @@ class _HomePageState extends State<HomePage> {
   final userFocusNode = FocusNode();
   static var urlText = '';
   static var userText = '';
-  Color userColor;
 
   @override
   void initState() {
     super.initState();
-    userColor = CupertinoColors.placeholderText;
-    userFocusNode.addListener(() {
-      if (userFocusNode.hasFocus) {
-        setState(() {
-          userColor = CupertinoDynamicColor.resolve(setting.iconColor, context);
-        });
-      } else {
-        setState(() {
-          userColor = CupertinoColors.placeholderText;
-        });
-      }
-    });
+    final window = WidgetsBinding.instance.window;
+    window.onPlatformBrightnessChanged = () {
+      setting.platformBrightness = window.platformBrightness;
+      if (UserData.isSystemThemeMode)
+        UserData.brightness.add(window.platformBrightness);
+    };
   }
 
   @override
@@ -48,6 +42,7 @@ class _HomePageState extends State<HomePage> {
     userController.dispose();
     urlFocusNode.dispose();
     userFocusNode.dispose();
+    UserData.brightness.sink.close();
     super.dispose();
   }
 

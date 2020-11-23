@@ -37,7 +37,6 @@ dependencies:
   qrscan: ^0.2.17
   http: ^0.12.2
   flame: ^0.28.0
-  settings_ui: ^0.4.0
   flutter_launcher_icons: ^0.8.1
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.

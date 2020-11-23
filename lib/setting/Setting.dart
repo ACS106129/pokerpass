@@ -19,6 +19,10 @@ final userRegex = RegExp(r'^[a-zA-Z0-9]{8,20}');
 final passwordRegex = RegExp(r'^[a-zA-Z0-9]{8,15}');
 final urlRegex = RegExp(
     r'^(https?:\/\/(www\.)?)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)');
+final bgColor = CupertinoDynamicColor.withBrightness(
+  color: Colors.white,
+  darkColor: Colors.grey.shade900,
+);
 final loadingColor = CupertinoDynamicColor.withBrightness(
   color: Colors.black26,
   darkColor: Colors.white10,
@@ -35,8 +39,10 @@ final iconColor = CupertinoDynamicColor.withBrightness(
   color: Colors.blue.shade600,
   darkColor: Colors.blue.shade300,
 );
+Brightness platformBrightness =
+    MediaQueryData.fromWindow(WidgetsBinding.instance.window)
+        .platformBrightness;
 
 class DebugConfig {
   static const _isModeOn = false;
-  static const brightness = _isModeOn ? Brightness.dark : null;
 }

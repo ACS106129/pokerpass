@@ -11,6 +11,7 @@ import 'package:pokerpass/page/mode_page.dart';
 import 'package:pokerpass/page/register_page.dart';
 import 'package:pokerpass/page/setting_page.dart';
 import 'package:pokerpass/setting/setting.dart' as setting;
+import 'package:pokerpass/setting/user.dart';
 import 'package:window_size/window_size.dart';
 
 void main() async {
@@ -33,27 +34,32 @@ void main() async {
 class MyApp extends StatelessWidget {
   @override
   Widget build(final BuildContext context) {
-    return CupertinoApp(
-      title: 'PokerPass',
-      theme: CupertinoThemeData(
-        brightness: setting.DebugConfig.brightness,
-        scaffoldBackgroundColor: CupertinoDynamicColor.withBrightness(
-          color: Colors.white,
-          darkColor: Colors.grey.shade900,
-        ),
-      ),
-      builder: BotToastInit(),
-      routes: {
-        ModePage.id: (_) => ModePage(),
-        RegisterPage.id: (_) => RegisterPage(),
-        SettingPage.id: (_) => SettingPage(),
-        QRCodePage.id: (_) => QRCodePage(),
-        PCPage.id: (_) => PCPage(),
+    return StreamBuilder<Brightness>(
+      initialData: setting.platformBrightness,
+      stream: UserData.brightness.stream,
+      builder: (context, snapshot) {
+        UserData.snapshot = snapshot;
+        return CupertinoApp(
+          title: 'PokerPass',
+          theme: CupertinoThemeData(
+            brightness: snapshot.data,
+            scaffoldBackgroundColor:
+                CupertinoDynamicColor.resolve(setting.bgColor, context),
+          ),
+          builder: BotToastInit(),
+          routes: {
+            ModePage.id: (_) => ModePage(),
+            RegisterPage.id: (_) => RegisterPage(),
+            SettingPage.id: (_) => SettingPage(),
+            QRCodePage.id: (_) => QRCodePage(),
+            PCPage.id: (_) => PCPage(),
+          },
+          navigatorObservers: [
+            BotToastNavigatorObserver(),
+          ],
+          home: HomePage(),
+        );
       },
-      navigatorObservers: [
-        BotToastNavigatorObserver(),
-      ],
-      home: HomePage(),
     );
   }
 }
