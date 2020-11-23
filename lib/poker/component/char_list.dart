@@ -1,4 +1,4 @@
-List<String> charList = [
+const List<String> charList = [
   '!',
   '1',
   '@',

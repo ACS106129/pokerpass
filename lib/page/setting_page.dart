@@ -1,5 +1,4 @@
 import 'package:flutter/cupertino.dart';
-import 'package:pokerpass/setting/setting.dart' as setting;
 import 'package:settings_ui/settings_ui.dart';
 
 class SettingPage extends StatefulWidget {
@@ -20,7 +19,7 @@ class _SettingPageState extends State<SettingPage> {
           trailing: GestureDetector(
             onTap: () {
               // finish user configuration
-              Navigator.pop(context);
+              Navigator.pop(context, '已保存');
             },
             child: Text(
               '完成',

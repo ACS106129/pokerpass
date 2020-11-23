@@ -28,7 +28,7 @@ class _PCPageState extends State<PCPage> {
         ),
       ),
       onWillPop: () async {
-        return await showCupertinoDialog(
+        await showCupertinoDialog(
           context: context,
           builder: (context) => CupertinoAlertDialog(
             title: const Text('警告'),
@@ -36,12 +36,13 @@ class _PCPageState extends State<PCPage> {
             actions: [
               CupertinoDialogAction(
                 child: const Text('取消'),
-                onPressed: () => Navigator.pop(context, false),
+                onPressed: () => Navigator.pop(context),
               ),
               CupertinoDialogAction(
                 child: const Text('中止'),
                 onPressed: () {
                   // delete server random and client random
+                  Navigator.pop(context);
                   Navigator.pop(context, true);
                   BotToast.showText(text: '已中止登入');
                 },
@@ -49,6 +50,7 @@ class _PCPageState extends State<PCPage> {
             ],
           ),
         );
+        return false;
       },
     );
   }

@@ -1,6 +1,7 @@
 import 'package:bot_toast/bot_toast.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:pokerpass/page/2FA/qrcode_page.dart';
 import 'package:pokerpass/page/PC/pc_page.dart';
@@ -43,7 +44,7 @@ class _ModePageState extends State<ModePage> {
         ),
       ),
       onWillPop: () async {
-        return await showCupertinoDialog(
+        await showCupertinoDialog(
           context: context,
           builder: (context) => CupertinoAlertDialog(
             title: const Text('警告'),
@@ -51,7 +52,7 @@ class _ModePageState extends State<ModePage> {
             actions: [
               CupertinoDialogAction(
                 child: const Text('取消'),
-                onPressed: () => Navigator.pop(context, false),
+                onPressed: () => Navigator.pop(context),
               ),
               CupertinoDialogAction(
                 child: const Text('中斷'),
@@ -64,10 +65,11 @@ class _ModePageState extends State<ModePage> {
                     backgroundColor: CupertinoDynamicColor.resolve(
                         setting.loadingColor, context),
                     duration: Duration(milliseconds: 400),
-                    onClose: () => WidgetsBinding.instance.addPostFrameCallback(
+                    onClose: () =>
+                        SchedulerBinding.instance.addPostFrameCallback(
                       (_) async {
-                        Navigator.pop(context, true);
-                        BotToast.showText(text: '已中斷連線');
+                        Navigator.pop(context);
+                        Navigator.pop(context, '已中斷連線');
                       },
                     ),
                   );
@@ -76,6 +78,7 @@ class _ModePageState extends State<ModePage> {
             ],
           ),
         );
+        return false;
       },
     );
   }
@@ -98,6 +101,7 @@ class _ModePageState extends State<ModePage> {
                   onPressed: () async {
                     // server number, session id and client number
                     var result = await Navigator.pushNamed(context, PCPage.id);
+                    if (result is String) BotToast.showText(text: result);
                   },
                   padding: EdgeInsets.symmetric(
                     vertical: contentSize.height / 20,
@@ -129,6 +133,7 @@ class _ModePageState extends State<ModePage> {
                 if (await Permission.camera.status.isGranted) {
                   var result = await Navigator.pushNamed(context, QRCodePage.id,
                       arguments: await scan());
+                  if (result is String) BotToast.showText(text: result);
                 } else {
                   await showCupertinoDialog(
                     context: context,
@@ -150,6 +155,7 @@ class _ModePageState extends State<ModePage> {
                 }
               } else {
                 var result = await Navigator.pushNamed(context, QRCodePage.id);
+                if (result is String) BotToast.showText(text: result);
               }
             },
             padding: EdgeInsets.symmetric(

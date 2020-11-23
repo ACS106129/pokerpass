@@ -68,22 +68,27 @@ class _HomePageState extends State<HomePage> {
         ),
       ),
       onWillPop: () async {
-        return await showCupertinoDialog(
+        await showCupertinoDialog(
           context: context,
           builder: (context) => CupertinoAlertDialog(
             content: const Text('結束程式?'),
             actions: [
               CupertinoDialogAction(
                 child: const Text('取消'),
-                onPressed: () => Navigator.pop(context, false),
+                onPressed: () => Navigator.pop(context),
               ),
               CupertinoDialogAction(
                 child: const Text('結束'),
-                onPressed: () => Navigator.pop(context, true),
+                onPressed: () {
+                  Navigator.pop(context);
+                  // exit with return 0
+                  Navigator.pop(context, 0);
+                },
               ),
             ],
           ),
         );
+        return false;
       },
     );
   }
@@ -141,8 +146,8 @@ class _HomePageState extends State<HomePage> {
                 onClose: () => WidgetsBinding.instance.addPostFrameCallback(
                   (_) async {
                     // await login complete and get value
-
                     var result = await updateAndPush(context, ModePage.id);
+                    if (result is String) BotToast.showText(text: result);
                   },
                 ),
               );
@@ -163,6 +168,7 @@ class _HomePageState extends State<HomePage> {
                 ),
                 onPressed: () async {
                   var result = await updateAndPush(context, SettingPage.id);
+                  if (result is String) BotToast.showText(text: result);
                 },
                 padding: EdgeInsets.symmetric(
                   horizontal: contentSize.width / 10,
@@ -196,13 +202,13 @@ class _HomePageState extends State<HomePage> {
   }
 
   // update current state and push to next route
-  Future<Object> updateAndPush(final BuildContext context, final String id,
+  Future<Object> updateAndPush(final BuildContext context, final String toId,
       {Object arguments}) async {
     urlText = urlController.text;
     userText = userController.text;
     urlFocusNode.unfocus();
     userFocusNode.unfocus();
-    return await Navigator.pushNamed(context, id, arguments: arguments);
+    return Navigator.pushNamed(context, toId, arguments: arguments);
   }
 
   CupertinoTextField cupertinoTextField(

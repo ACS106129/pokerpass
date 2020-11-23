@@ -1,6 +1,7 @@
 import 'dart:ui';
 
 import 'package:bot_toast/bot_toast.dart';
+import 'package:flame/flame.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:pokerpass/page/2FA/qrcode_page.dart';
@@ -14,6 +15,8 @@ import 'package:window_size/window_size.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await Flame.images
+      .loadAll(['spade.png', 'heart.png', 'diamond.png', 'club.png']);
   // windows sizebox will be disabled, others preserve it
   if (setting.isDesktop) {
     setWindowTitle('PokerPass');
@@ -41,11 +44,11 @@ class MyApp extends StatelessWidget {
       ),
       builder: BotToastInit(),
       routes: {
-        ModePage.id: (context) => ModePage(),
-        RegisterPage.id: (context) => RegisterPage(),
-        SettingPage.id: (context) => SettingPage(),
-        QRCodePage.id: (context) => QRCodePage(),
-        PCPage.id: (context) => PCPage(),
+        ModePage.id: (_) => ModePage(),
+        RegisterPage.id: (_) => RegisterPage(),
+        SettingPage.id: (_) => SettingPage(),
+        QRCodePage.id: (_) => QRCodePage(),
+        PCPage.id: (_) => PCPage(),
       },
       navigatorObservers: [
         BotToastNavigatorObserver(),

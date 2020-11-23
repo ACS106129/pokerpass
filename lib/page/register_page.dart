@@ -1,6 +1,7 @@
 import 'package:bot_toast/bot_toast.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
 import 'package:pokerpass/setting/setting.dart' as setting;
 
@@ -72,7 +73,7 @@ class _RegisterPageState extends State<RegisterPage> {
                 backgroundColor: CupertinoDynamicColor.resolve(
                     setting.loadingColor, context),
                 duration: Duration(milliseconds: 700),
-                onClose: () => WidgetsBinding.instance.addPostFrameCallback(
+                onClose: () => SchedulerBinding.instance.addPostFrameCallback(
                   (_) async {
                     // await submit complete and get value
 
