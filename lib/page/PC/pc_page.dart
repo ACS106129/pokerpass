@@ -1,4 +1,3 @@
-import 'package:bot_toast/bot_toast.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:pokerpass/poker/poker.dart';
 
@@ -43,8 +42,7 @@ class _PCPageState extends State<PCPage> {
                 onPressed: () {
                   // delete server random and client random
                   Navigator.pop(context);
-                  Navigator.pop(context, true);
-                  BotToast.showText(text: '已中止登入');
+                  Navigator.pop(context, '已中止登入');
                 },
               ),
             ],
