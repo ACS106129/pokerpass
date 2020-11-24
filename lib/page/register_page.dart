@@ -3,10 +3,11 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:pokerpass/page/2FA/qrcode_page.dart';
-import 'package:pokerpass/setting/setting.dart' as setting;
+import 'package:pokerpass/page/qrcode_page.dart';
+import 'package:pokerpass/setting/setting.dart';
 import 'package:pokerpass/setting/user.dart';
 import 'package:pokerpass/utility/argument/qr_argument.dart';
+import 'package:pokerpass/utility/utility.dart';
 import 'package:qrscan/qrscan.dart';
 
 class RegisterPage extends StatefulWidget {
@@ -20,9 +21,9 @@ class _RegisterPageState extends State<RegisterPage> {
   final urlController = TextEditingController(text: urlText);
   final userController = TextEditingController(text: userText);
   final passwordController = TextEditingController(text: '');
-  final urlFocusNode = FocusNode(debugLabel: setting.urlLabel);
-  final userFocusNode = FocusNode(debugLabel: setting.userLabel);
-  final passwordFocusNode = FocusNode(debugLabel: setting.passwordLabel);
+  final urlFocusNode = FocusNode(debugLabel: Setting.urlLabel);
+  final userFocusNode = FocusNode(debugLabel: Setting.userLabel);
+  final passwordFocusNode = FocusNode(debugLabel: Setting.passwordLabel);
   static var urlText = '';
   static var userText = '';
 
@@ -45,69 +46,6 @@ class _RegisterPageState extends State<RegisterPage> {
         navigationBar: CupertinoNavigationBar(
           previousPageTitle: '返回',
           middle: const Text('註冊'),
-          trailing: GestureDetector(
-            child: Text(
-              '送出',
-              style: TextStyle(
-                color: CupertinoDynamicColor.resolve(
-                    CupertinoColors.activeGreen, context),
-              ),
-            ),
-            onTap: () async {
-              if (!setting.urlRegex.hasMatch(urlController.text)) {
-                BotToast.showText(text: '網址格式錯誤');
-                return;
-              }
-              if (!setting.userRegex.hasMatch(userController.text)) {
-                BotToast.showText(text: '使用者格式錯誤');
-                return;
-              }
-              if (!setting.passwordRegex.hasMatch(passwordController.text)) {
-                BotToast.showText(text: '通行碼格式錯誤');
-                return;
-              }
-              // cancel keyboard input
-              urlFocusNode.unfocus();
-              userFocusNode.unfocus();
-              passwordFocusNode.unfocus();
-              BotToast.showLoading(
-                crossPage: false,
-                animationDuration: Duration(milliseconds: 250),
-                animationReverseDuration: Duration(milliseconds: 250),
-                backButtonBehavior: BackButtonBehavior.none,
-                backgroundColor: CupertinoDynamicColor.resolve(
-                    setting.loadingColor, context),
-                duration: Duration(milliseconds: 700),
-              );
-              // submit user id and password to server through url, then get device key and session id
-              final String deviceKey = '123456';
-              final String sessionId = 'abc';
-              Future.delayed(Duration(milliseconds: 350), () async {
-                // save device key in mobile device
-                if (!setting.isDesktop)
-                  await UserData.usePrefs((prefs) =>
-                      prefs.setString(setting.deviceKeyName, deviceKey));
-                else {
-                  // generate qrcode to mobile
-                  var result = await Navigator.pushNamed(context, QRCodePage.id,
-                      arguments: QRArgument(
-                        ProcessType.Register,
-                        url: urlController.text,
-                        user: userController.text,
-                        password: passwordController.text,
-                        sessionId: sessionId,
-                        deviceKey: deviceKey,
-                      ));
-                  if (result is String) BotToast.showText(text: result);
-                }
-                // erase register user id
-                userText = '';
-                // give url and user id to login
-                Navigator.pop(
-                    context, [urlController.text, userController.text]);
-              });
-            },
-          ),
         ),
         child: SafeArea(
           child: Center(
@@ -133,97 +71,171 @@ class _RegisterPageState extends State<RegisterPage> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          cupertinoTextField(setting.urlLabel, '(URL名稱)', '[註冊網址]',
-              TextInputAction.next, setting.urlInputRegex, urlFocusNode),
+          cupertinoTextField(Setting.urlLabel, '(URL名稱)', '[註冊網址]',
+              TextInputAction.next, Setting.urlInputRegex, urlFocusNode),
           SizedBox(height: contentSize.height / 15),
-          cupertinoTextField(setting.userLabel, '(8~20字元)', '[用戶名]',
-              TextInputAction.next, setting.userInputRegex, userFocusNode),
+          cupertinoTextField(Setting.userLabel, '(8~20字元)', '[用戶名]',
+              TextInputAction.next, Setting.userInputRegex, userFocusNode),
           SizedBox(height: contentSize.height / 15),
           cupertinoTextField(
-              setting.passwordLabel,
+              Setting.passwordLabel,
               '(8~15字元)',
               '[通行碼]',
               TextInputAction.done,
-              setting.passwordInputRegex,
+              Setting.passwordInputRegex,
               passwordFocusNode),
-          SizedBox(height: contentSize.height / 5),
-          CupertinoButton(
-            child: const Text('清除全部'),
-            color: CupertinoDynamicColor.withBrightness(
-              color: Colors.black54,
-              darkColor: Colors.white70,
-            ),
-            onPressed: () {
-              urlController.clear();
-              userController.clear();
-              passwordController.clear();
-            },
-            padding: EdgeInsets.symmetric(
-              horizontal: contentSize.width / 20,
-            ),
-          ),
           SizedBox(height: contentSize.height / 15),
-          !setting.isDesktop
-              ? CupertinoButton(
-                  child: const Text('QR取得註冊'),
-                  color: setting.connectSessionButtonColor,
-                  onPressed: () async {
-                    var qrNavFunc = () async {
-                      BotToast.showLoading(
-                        crossPage: false,
-                        animationDuration: Duration(milliseconds: 200),
-                        animationReverseDuration: Duration(milliseconds: 200),
-                        backButtonBehavior: BackButtonBehavior.none,
-                        backgroundColor: CupertinoDynamicColor.resolve(
-                            setting.loadingColor, context),
-                        duration: Duration(milliseconds: 800),
-                      );
-                      Future.delayed(Duration(milliseconds: 200), () async {
-                        var scanResult = await scan();
-                        // deal result to qrArgument
-                        var result = await Navigator.pushNamed(
-                            context, QRCodePage.id,
-                            arguments:
-                                QRArgument(ProcessType.FA, url: scanResult));
-                        if (result is String) BotToast.showText(text: result);
-                      });
-                    };
-                    if (await Permission.camera.status.isGranted)
-                      await qrNavFunc();
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              CupertinoButton(
+                child: const Text('送出'),
+                color: Setting.submitButtonColor,
+                onPressed: () {
+                  if (!Setting.urlRegex.hasMatch(urlController.text)) {
+                    BotToast.showText(text: '網址格式錯誤');
+                    return;
+                  }
+                  if (!Setting.userRegex.hasMatch(userController.text)) {
+                    BotToast.showText(text: '使用者格式錯誤');
+                    return;
+                  }
+                  if (!Setting.passwordRegex
+                      .hasMatch(passwordController.text)) {
+                    BotToast.showText(text: '通行碼格式錯誤');
+                    return;
+                  }
+                  // cancel keyboard input
+                  urlFocusNode.unfocus();
+                  userFocusNode.unfocus();
+                  passwordFocusNode.unfocus();
+                  Utility.loading(Duration(milliseconds: 1200), context);
+                  // submit user id and password to server through url, then get device key and session id
+                  final String deviceKey = '123456';
+                  final String sessionId = 'abc';
+                  Future.delayed(Duration(milliseconds: 350), () async {
+                    // save device key in mobile device
+                    if (!Setting.isDesktop)
+                      await UserData.usePrefs((prefs) =>
+                          prefs.setString(Setting.deviceKeyName, deviceKey));
                     else {
-                      await showCupertinoDialog(
-                        context: context,
-                        builder: (context) => CupertinoAlertDialog(
-                          title: Text('相機權限要求'),
-                          content: Text('該應用需要相機進行QRCode掃描'),
-                          actions: [
-                            CupertinoDialogAction(
-                              child: Text('取消'),
-                              onPressed: () => Navigator.pop(context),
-                            ),
-                            CupertinoDialogAction(
-                              child: Text('設定'),
-                              onPressed: () {
-                                Navigator.pop(context);
-                                openAppSettings();
-                              },
-                            ),
-                            CupertinoDialogAction(
-                              child: Text('啟用'),
-                              onPressed: () async {
-                                Navigator.pop(context);
-                                if (await Permission.camera.request().isGranted)
-                                  await qrNavFunc();
-                              },
-                            ),
-                          ],
-                        ),
-                      );
+                      // generate qrcode to mobile
+                      var result =
+                          await Navigator.pushNamed(context, QRCodePage.id,
+                              arguments: QRArgument(
+                                ProcessType.Register,
+                                url: urlController.text,
+                                user: userController.text,
+                                password: passwordController.text,
+                                sessionId: sessionId,
+                                deviceKey: deviceKey,
+                              ));
+                      if (result is String) BotToast.showText(text: result);
                     }
-                  },
-                  padding: EdgeInsets.symmetric(
-                    horizontal: contentSize.width / 20,
-                  ),
+                    // erase register user id
+                    userText = '';
+                    // give url and user id to login
+                    Navigator.pop(
+                        context, [urlController.text, userController.text]);
+                  });
+                },
+                padding: EdgeInsets.symmetric(
+                  horizontal: contentSize.width / 20,
+                ),
+              ),
+              SizedBox(width: contentSize.width / 10),
+              CupertinoButton(
+                child: const Text('清除'),
+                color: Setting.registerButtonColor,
+                onPressed: () {
+                  urlController.clear();
+                  userController.clear();
+                  passwordController.clear();
+                },
+                padding: EdgeInsets.symmetric(
+                  horizontal: contentSize.width / 20,
+                ),
+              ),
+            ],
+          ),
+          !Setting.isDesktop
+              ? Column(
+                  children: [
+                    SizedBox(height: contentSize.height / 10),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Divider(
+                            color: CupertinoDynamicColor.resolve(
+                                Setting.promptTextColor, context),
+                          ),
+                        ),
+                        const Text(' 或 '),
+                        Expanded(
+                          child: Divider(
+                            color: CupertinoDynamicColor.resolve(
+                                Setting.promptTextColor, context),
+                          ),
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: contentSize.height / 10),
+                    CupertinoButton(
+                      child: const Text('完成PC端註冊'),
+                      color: Setting.connectSessionButtonColor,
+                      onPressed: () async {
+                        var qrNavFunc = () {
+                          Utility.loading(Duration(milliseconds: 1200), context);
+                          Future.delayed(Duration(milliseconds: 200), () async {
+                            var scanResult = await scan();
+                            // deal result into QRArgument
+                            var result = await Navigator.pushNamed(
+                                context, QRCodePage.id,
+                                arguments: QRArgument(ProcessType.Register,
+                                    url: scanResult));
+                            if (result is String)
+                              BotToast.showText(text: result);
+                          });
+                        };
+                        if (await Permission.camera.status.isGranted)
+                          qrNavFunc();
+                        else {
+                          await showCupertinoDialog(
+                            context: context,
+                            builder: (context) => CupertinoAlertDialog(
+                              title: Text('相機權限要求'),
+                              content: Text('該應用需要相機進行QRCode掃描'),
+                              actions: [
+                                CupertinoDialogAction(
+                                  child: Text('取消'),
+                                  onPressed: () => Navigator.pop(context),
+                                ),
+                                CupertinoDialogAction(
+                                  child: Text('設定'),
+                                  onPressed: () {
+                                    Navigator.pop(context);
+                                    openAppSettings();
+                                  },
+                                ),
+                                CupertinoDialogAction(
+                                  child: Text('啟用'),
+                                  onPressed: () async {
+                                    Navigator.pop(context);
+                                    if (await Permission.camera
+                                        .request()
+                                        .isGranted) qrNavFunc();
+                                  },
+                                ),
+                              ],
+                            ),
+                          );
+                        }
+                      },
+                      padding: EdgeInsets.symmetric(
+                        horizontal: contentSize.width / 20,
+                      ),
+                    )
+                  ],
                 )
               : SizedBox.shrink(),
         ],
@@ -242,11 +254,11 @@ class _RegisterPageState extends State<RegisterPage> {
       clearButtonMode: OverlayVisibilityMode.editing,
       controller: (() {
         switch (label) {
-          case setting.urlLabel:
+          case Setting.urlLabel:
             return urlController;
-          case setting.userLabel:
+          case Setting.userLabel:
             return userController;
-          case setting.passwordLabel:
+          case Setting.passwordLabel:
             return passwordController;
           default:
             throw new Exception('Label $label Error!');
@@ -267,7 +279,7 @@ class _RegisterPageState extends State<RegisterPage> {
         ),
       ],
       maxLines: 1,
-      obscureText: label == setting.passwordLabel,
+      obscureText: label == Setting.passwordLabel,
       onTap: () {
         // focus change border color
       },
@@ -275,13 +287,13 @@ class _RegisterPageState extends State<RegisterPage> {
         prompt,
         style: TextStyle(
           color:
-              CupertinoDynamicColor.resolve(setting.promptTextColor, context),
+              CupertinoDynamicColor.resolve(Setting.promptTextColor, context),
         ),
       ),
       placeholder: placeholder,
       placeholderStyle: TextStyle(
         fontWeight: FontWeight.w400,
-        color: CupertinoDynamicColor.resolve(setting.placeholderColor, context),
+        color: CupertinoDynamicColor.resolve(Setting.placeholderColor, context),
       ),
       style: TextStyle(
         height: 1.5,

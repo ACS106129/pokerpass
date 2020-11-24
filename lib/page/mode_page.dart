@@ -2,10 +2,12 @@ import 'package:bot_toast/bot_toast.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:pokerpass/page/2FA/qrcode_page.dart';
 import 'package:pokerpass/page/PC/pc_page.dart';
-import 'package:pokerpass/setting/setting.dart' as setting;
+import 'package:pokerpass/page/qrcode_page.dart';
+import 'package:pokerpass/setting/setting.dart';
 import 'package:pokerpass/utility/area.dart';
+import 'package:pokerpass/utility/argument/qr_argument.dart';
+import 'package:pokerpass/utility/utility.dart';
 import 'package:qrscan/qrscan.dart';
 
 class ModePage extends StatefulWidget {
@@ -16,8 +18,6 @@ class ModePage extends StatefulWidget {
 }
 
 class _ModePageState extends State<ModePage> {
-  bool isAbsorbTouch = false;
-
   @override
   void initState() {
     super.initState();
@@ -26,61 +26,50 @@ class _ModePageState extends State<ModePage> {
 
   @override
   Widget build(final BuildContext context) {
-    return AbsorbPointer(
-      absorbing: isAbsorbTouch,
-      child: WillPopScope(
-        child: CupertinoPageScaffold(
-          navigationBar: const CupertinoNavigationBar(
-            previousPageTitle: '中斷',
-            middle: Text('選擇登入方式'),
-          ),
-          child: SafeArea(
-            child: Center(
-              child: LayoutBuilder(
-                builder: (context, constraints) => modePageContent(
-                  context,
-                  Size(constraints.maxWidth, constraints.maxHeight),
-                ),
+    return WillPopScope(
+      child: CupertinoPageScaffold(
+        navigationBar: const CupertinoNavigationBar(
+          previousPageTitle: '中斷',
+          middle: Text('選擇方式'),
+        ),
+        child: SafeArea(
+          child: Center(
+            child: LayoutBuilder(
+              builder: (context, constraints) => modePageContent(
+                context,
+                Size(constraints.maxWidth, constraints.maxHeight),
               ),
             ),
           ),
         ),
-        onWillPop: () async {
-          await showCupertinoDialog(
-            context: context,
-            builder: (context) => CupertinoAlertDialog(
-              title: const Text('警告'),
-              content: const Text('中斷Session連線?'),
-              actions: [
-                CupertinoDialogAction(
-                  child: const Text('取消'),
-                  onPressed: () => Navigator.pop(context),
-                ),
-                CupertinoDialogAction(
-                  child: const Text('中斷'),
-                  onPressed: () {
-                    BotToast.showLoading(
-                      crossPage: false,
-                      animationDuration: Duration(milliseconds: 100),
-                      animationReverseDuration: Duration(milliseconds: 100),
-                      backButtonBehavior: BackButtonBehavior.none,
-                      backgroundColor: CupertinoDynamicColor.resolve(
-                          setting.loadingColor, context),
-                      duration: Duration(milliseconds: 400),
-                    );
-                    // disconnect session login
-                    Future.delayed(Duration(milliseconds: 150), () async {
-                      Navigator.pop(context);
-                      Navigator.pop(context, '已中斷連線');
-                    });
-                  },
-                ),
-              ],
-            ),
-          );
-          return false;
-        },
       ),
+      onWillPop: () async {
+        await showCupertinoDialog(
+          context: context,
+          builder: (context) => CupertinoAlertDialog(
+            title: const Text('警告'),
+            content: const Text('中斷Session連線?'),
+            actions: [
+              CupertinoDialogAction(
+                child: const Text('取消'),
+                onPressed: () => Navigator.pop(context),
+              ),
+              CupertinoDialogAction(
+                child: const Text('中斷'),
+                onPressed: () {
+                  Utility.loading(Duration(milliseconds: 600), context);
+                  // disconnect session login
+                  Future.delayed(Duration(milliseconds: 150), () async {
+                    Navigator.pop(context);
+                    Navigator.pop(context, '已中斷連線');
+                  });
+                },
+              ),
+            ],
+          ),
+        );
+        return false;
+      },
     );
   }
 
@@ -92,77 +81,53 @@ class _ModePageState extends State<ModePage> {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           // PokerPC or PokerGO mode
-          setting.isDesktop
-              ? CupertinoButton(
-                  child: Text(
-                    'PokerPC',
-                    style: TextStyle(fontSize: 28),
-                  ),
-                  color: CupertinoColors.activeGreen,
-                  onPressed: () async {
+          CupertinoButton(
+            child: Text(
+              '登入',
+              style: TextStyle(fontSize: 26),
+            ),
+            color: CupertinoColors.activeGreen,
+            onPressed: Setting.isDesktop
+                ? () async {
                     // server number, session id and client number
-                    BotToast.showLoading(
-                      crossPage: false,
-                      animationDuration: Duration(milliseconds: 100),
-                      animationReverseDuration: Duration(milliseconds: 100),
-                      backButtonBehavior: BackButtonBehavior.none,
-                      backgroundColor: CupertinoDynamicColor.resolve(
-                          setting.loadingColor, context),
-                      duration: Duration(milliseconds: 400),
-                    );
+                    Utility.loading(Duration(milliseconds: 600), context);
                     Future.delayed(Duration(milliseconds: 200), () async {
                       var result =
                           await Navigator.pushNamed(context, PCPage.id);
                       if (result is String) BotToast.showText(text: result);
                     });
-                  },
-                  padding: EdgeInsets.symmetric(
-                    vertical: contentSize.height / 20,
-                  ),
-                )
-              : CupertinoButton(
-                  child: Text(
-                    'PokerGO',
-                    style: TextStyle(fontSize: 28),
-                  ),
-                  color: CupertinoColors.activeGreen,
-                  onPressed: () async {},
-                  padding: EdgeInsets.symmetric(
-                    vertical: contentSize.height / 20,
-                  ),
-                ),
+                  }
+                : () async {},
+            padding: EdgeInsets.symmetric(
+              vertical: contentSize.height / 20,
+            ),
+          ),
           SizedBox(
             height: getSafeArea(context).height / 7,
           ),
           // Poker2FA mode
           CupertinoButton(
             child: Text(
-              'Poker2FA',
-              style: TextStyle(fontSize: 28),
+              '2FA(QRCode${Setting.isDesktop ? '產生' : '掃描'})',
+              style: TextStyle(fontSize: 26),
             ),
             color: CupertinoColors.activeGreen,
             onPressed: () async {
-              if (!setting.isDesktop) {
-                var qrNavFunc = () async {
-                  BotToast.showLoading(
-                    crossPage: false,
-                    animationDuration: Duration(milliseconds: 200),
-                    animationReverseDuration: Duration(milliseconds: 200),
-                    backButtonBehavior: BackButtonBehavior.none,
-                    backgroundColor: CupertinoDynamicColor.resolve(
-                        setting.loadingColor, context),
-                    duration: Duration(milliseconds: 800),
-                  );
+              if (!Setting.isDesktop) {
+                var qrNavFunc = () {
+                  Utility.loading(Duration(milliseconds: 1200), context);
                   Future.delayed(Duration(milliseconds: 200), () async {
                     var scanResult = await scan();
+                    // deal 2FA result into QRArgument
                     var result = await Navigator.pushNamed(
                         context, QRCodePage.id,
-                        arguments: scanResult);
+                        arguments:
+                            QRArgument(ProcessType.TwoFA, url: scanResult));
                     if (result is String) BotToast.showText(text: result);
                   });
                 };
                 if (await Permission.camera.status.isGranted)
-                  await qrNavFunc();
+                  qrNavFunc();
                 else {
                   await showCupertinoDialog(
                     context: context,
@@ -186,7 +151,7 @@ class _ModePageState extends State<ModePage> {
                           onPressed: () async {
                             Navigator.pop(context);
                             if (await Permission.camera.request().isGranted)
-                              await qrNavFunc();
+                              qrNavFunc();
                           },
                         ),
                       ],
@@ -194,15 +159,7 @@ class _ModePageState extends State<ModePage> {
                   );
                 }
               } else {
-                BotToast.showLoading(
-                  crossPage: false,
-                  animationDuration: Duration(milliseconds: 100),
-                  animationReverseDuration: Duration(milliseconds: 100),
-                  backButtonBehavior: BackButtonBehavior.none,
-                  backgroundColor: CupertinoDynamicColor.resolve(
-                      setting.loadingColor, context),
-                  duration: Duration(milliseconds: 400),
-                );
+                Utility.loading(Duration(milliseconds: 600), context);
                 Future.delayed(Duration(milliseconds: 200), () async {
                   var result =
                       await Navigator.pushNamed(context, QRCodePage.id);
@@ -217,10 +174,5 @@ class _ModePageState extends State<ModePage> {
         ],
       ),
     );
-  }
-
-  void scheduleAbsortTouch(final Duration duration) {
-    setState(() => isAbsorbTouch = true);
-    Future.delayed(duration, () => setState(() => isAbsorbTouch = false));
   }
 }

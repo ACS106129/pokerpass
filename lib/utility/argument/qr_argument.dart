@@ -33,4 +33,4 @@ class QRArgument {
       final this.password});
 }
 
-enum ProcessType { Register, FA }
+enum ProcessType { Register, TwoFA }

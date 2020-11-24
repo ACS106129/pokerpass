@@ -4,13 +4,13 @@ import 'package:bot_toast/bot_toast.dart';
 import 'package:flame/flame.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:pokerpass/page/2FA/qrcode_page.dart';
 import 'package:pokerpass/page/PC/pc_page.dart';
 import 'package:pokerpass/page/home_page.dart';
 import 'package:pokerpass/page/mode_page.dart';
+import 'package:pokerpass/page/qrcode_page.dart';
 import 'package:pokerpass/page/register_page.dart';
 import 'package:pokerpass/page/setting_page.dart';
-import 'package:pokerpass/setting/setting.dart' as setting;
+import 'package:pokerpass/setting/setting.dart';
 import 'package:pokerpass/setting/user.dart';
 import 'package:window_size/window_size.dart';
 
@@ -19,14 +19,14 @@ void main() async {
   await Flame.images
       .loadAll(['spade.png', 'heart.png', 'diamond.png', 'club.png']);
   // windows sizebox will be disabled, others preserve it
-  if (setting.isDesktop) {
+  if (Setting.isDesktop) {
     setWindowTitle('PokerPass');
     setWindowFrame(Rect.fromCenter(
         center: (await getCurrentScreen()).frame.center,
-        width: setting.width,
-        height: setting.height));
-    setWindowMinSize(Size(setting.width, setting.height));
-    setWindowMaxSize(Size(setting.width, setting.height));
+        width: Setting.width,
+        height: Setting.height));
+    setWindowMinSize(Size(Setting.width, Setting.height));
+    setWindowMaxSize(Size(Setting.width, Setting.height));
   }
   runApp(MyApp());
 }
@@ -35,7 +35,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(final BuildContext context) {
     return StreamBuilder<Brightness>(
-      initialData: setting.platformBrightness,
+      initialData: Config.platformBrightness,
       stream: UserData.brightness.stream,
       builder: (context, snapshot) {
         UserData.snapshot = snapshot;
@@ -44,7 +44,7 @@ class MyApp extends StatelessWidget {
           theme: CupertinoThemeData(
             brightness: snapshot.data,
             scaffoldBackgroundColor:
-                CupertinoDynamicColor.resolve(setting.bgColor, context),
+                CupertinoDynamicColor.resolve(Setting.bgColor, context),
           ),
           builder: BotToastInit(),
           routes: {

@@ -4,11 +4,12 @@ import 'package:bot_toast/bot_toast.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:pokerpass/setting/user.dart';
+import 'package:pokerpass/page/Setting_page.dart';
 import 'package:pokerpass/page/mode_page.dart';
 import 'package:pokerpass/page/register_page.dart';
-import 'package:pokerpass/page/setting_page.dart';
-import 'package:pokerpass/setting/setting.dart' as setting;
-import 'package:pokerpass/setting/user.dart';
+import 'package:pokerpass/setting/setting.dart';
+import 'package:pokerpass/utility/utility.dart';
 
 class HomePage extends StatefulWidget {
   static const id = '/';
@@ -28,9 +29,8 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
-    final window = WidgetsBinding.instance.window;
-    window.onPlatformBrightnessChanged = () {
-      setting.platformBrightness = window.platformBrightness;
+    WidgetsBinding.instance.window.onPlatformBrightnessChanged = () {
+      Config.platformBrightness = window.platformBrightness;
       if (UserData.isSystemThemeMode)
         UserData.brightness.add(window.platformBrightness);
     };
@@ -93,49 +93,40 @@ class _HomePageState extends State<HomePage> {
       width: contentSize.width * 0.7,
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
-        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Column(
             children: [
               cupertinoTextField(
-                  setting.urlLabel,
+                  Setting.urlLabel,
                   '目標網址(URL)',
                   CupertinoIcons.cloud,
                   TextInputAction.next,
-                  setting.urlInputRegex,
+                  Setting.urlInputRegex,
                   urlFocusNode),
               SizedBox(height: contentSize.height / 15),
               cupertinoTextField(
-                  setting.userLabel,
+                  Setting.userLabel,
                   '用戶名(8~20字元)',
                   CupertinoIcons.person,
                   TextInputAction.done,
-                  setting.userInputRegex,
+                  Setting.userInputRegex,
                   userFocusNode),
             ],
           ),
           SizedBox(height: contentSize.height / 10),
           CupertinoButton(
             child: const Text('建立Session連線'),
-            color: setting.connectSessionButtonColor,
+            color: Setting.connectSessionButtonColor,
             onPressed: () async {
-              if (!setting.urlRegex.hasMatch(urlController.text)) {
+              if (!Setting.urlRegex.hasMatch(urlController.text)) {
                 BotToast.showText(text: '網址格式錯誤!');
                 return;
               }
-              if (!setting.userRegex.hasMatch(userController.text)) {
+              if (!Setting.userRegex.hasMatch(userController.text)) {
                 BotToast.showText(text: '使用者格式錯誤!');
                 return;
               }
-              BotToast.showLoading(
-                crossPage: false,
-                animationDuration: Duration(milliseconds: 200),
-                animationReverseDuration: Duration(milliseconds: 200),
-                backButtonBehavior: BackButtonBehavior.none,
-                backgroundColor: CupertinoDynamicColor.resolve(
-                    setting.loadingColor, context),
-                duration: Duration(milliseconds: 800),
-              );
+              Utility.loading(Duration(milliseconds: 1200), context);
               // await request url connect value
               Future.delayed(Duration(milliseconds: 400), () async {
                 // await login complete and get value
@@ -144,29 +135,28 @@ class _HomePageState extends State<HomePage> {
               });
             },
             padding: EdgeInsets.symmetric(
-              vertical: contentSize.width / 30,
+              horizontal: contentSize.width / 10,
             ),
           ),
-          SizedBox(height: contentSize.height / 20),
+          SizedBox(height: contentSize.height / 15),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               CupertinoButton(
                 child: const Text('設定'),
-                color: setting.settingButtonColor,
+                color: Setting.settingButtonColor,
                 onPressed: () async {
                   var result = await updateAndPush(context, SettingPage.id);
                   if (result is String) BotToast.showText(text: result);
                 },
                 padding: EdgeInsets.symmetric(
-                  horizontal: contentSize.width / 10,
-                  vertical: contentSize.width / 30,
+                  horizontal: contentSize.width / 15,
                 ),
               ),
-              SizedBox(width: contentSize.width / 20),
+              SizedBox(width: contentSize.width / 10),
               CupertinoButton(
                 child: const Text('註冊'),
-                color: setting.registerButtonColor,
+                color: Setting.registerButtonColor,
                 onPressed: () async {
                   var result = await updateAndPush(context, RegisterPage.id);
                   if (result is List && result.length >= 2) {
@@ -175,8 +165,7 @@ class _HomePageState extends State<HomePage> {
                   }
                 },
                 padding: EdgeInsets.symmetric(
-                  horizontal: contentSize.width / 10,
-                  vertical: contentSize.width / 30,
+                  horizontal: contentSize.width / 15,
                 ),
               ),
             ],
@@ -206,15 +195,15 @@ class _HomePageState extends State<HomePage> {
     return CupertinoTextField(
       controller: (() {
         switch (label) {
-          case setting.urlLabel:
+          case Setting.urlLabel:
             return urlController;
-          case setting.userLabel:
+          case Setting.userLabel:
             return userController;
           default:
             throw new Exception('Label $label Error!');
         }
       })(),
-      cursorColor: CupertinoDynamicColor.resolve(setting.iconColor, context),
+      cursorColor: CupertinoDynamicColor.resolve(Setting.iconColor, context),
       decoration: BoxDecoration(
         border: Border.all(
           color: CupertinoColors.placeholderText,
@@ -226,7 +215,7 @@ class _HomePageState extends State<HomePage> {
       prefix: Icon(
         icon,
         semanticLabel: label,
-        color: CupertinoDynamicColor.resolve(setting.iconColor, context),
+        color: CupertinoDynamicColor.resolve(Setting.iconColor, context),
       ),
       inputFormatters: [
         FilteringTextInputFormatter(
@@ -241,7 +230,7 @@ class _HomePageState extends State<HomePage> {
       placeholder: placeholder,
       placeholderStyle: TextStyle(
         fontWeight: FontWeight.w400,
-        color: CupertinoDynamicColor.resolve(setting.placeholderColor, context),
+        color: CupertinoDynamicColor.resolve(Setting.placeholderColor, context),
       ),
       style: TextStyle(
         height: 1.5,

@@ -1,7 +1,6 @@
-import 'package:bot_toast/bot_toast.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:pokerpass/poker/poker.dart';
-import 'package:pokerpass/setting/setting.dart' as setting;
+import 'package:pokerpass/utility/utility.dart';
 
 class PCPage extends StatefulWidget {
   static const id = 'pc_page';
@@ -42,15 +41,7 @@ class _PCPageState extends State<PCPage> {
               CupertinoDialogAction(
                 child: const Text('中止'),
                 onPressed: () {
-                  BotToast.showLoading(
-                    crossPage: false,
-                    animationDuration: Duration(milliseconds: 100),
-                    animationReverseDuration: Duration(milliseconds: 100),
-                    backButtonBehavior: BackButtonBehavior.none,
-                    backgroundColor: CupertinoDynamicColor.resolve(
-                        setting.loadingColor, context),
-                    duration: Duration(milliseconds: 400),
-                  );
+                  Utility.loading(Duration(milliseconds: 600), context);
                   // await delete server random and client random
                   Future.delayed(Duration(milliseconds: 200), () async {
                     Navigator.pop(context);

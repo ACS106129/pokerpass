@@ -1,6 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:pokerpass/setting/setting.dart' as setting;
+import 'package:pokerpass/setting/setting.dart';
 import 'package:pokerpass/setting/user.dart';
 import 'package:pokerpass/utility/widget/cupertino_swith_list_tile.dart';
 
@@ -48,7 +48,7 @@ class _SettingPageState extends State<SettingPage> {
       ),
       onWillPop: () async {
         UserData.brightness.add(UserData.isSystemThemeMode
-            ? setting.platformBrightness
+            ? Config.platformBrightness
             : isDarkThemeModeTemp
                 ? Brightness.dark
                 : Brightness.light);
@@ -59,7 +59,7 @@ class _SettingPageState extends State<SettingPage> {
 
   Widget settingPageContent(final BuildContext context, final Size size) {
     return Scaffold(
-      backgroundColor: CupertinoDynamicColor.resolve(setting.bgColor, context),
+      backgroundColor: CupertinoDynamicColor.resolve(Setting.bgColor, context),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
@@ -68,9 +68,9 @@ class _SettingPageState extends State<SettingPage> {
               children: [
                 Icon(
                   CupertinoIcons.photo,
-                  semanticLabel: setting.themeLabel,
+                  semanticLabel: Setting.themeLabel,
                   color:
-                      CupertinoDynamicColor.resolve(setting.iconColor, context),
+                      CupertinoDynamicColor.resolve(Setting.iconColor, context),
                 ),
                 Text(
                   '主題',
@@ -78,7 +78,7 @@ class _SettingPageState extends State<SettingPage> {
                     fontSize: 26,
                     fontWeight: FontWeight.w500,
                     color: CupertinoDynamicColor.resolve(
-                        setting.promptTextColor, context),
+                        Setting.promptTextColor, context),
                   ),
                 ),
               ],
@@ -91,10 +91,10 @@ class _SettingPageState extends State<SettingPage> {
             title: Text('根據系統主題',
                 style: TextStyle(
                   color: CupertinoDynamicColor.resolve(
-                      setting.promptTextColor, context),
+                      Setting.promptTextColor, context),
                 )),
             onChanged: (value) {
-              if (value) UserData.brightness.add(setting.platformBrightness);
+              if (value) UserData.brightness.add(Config.platformBrightness);
               setState(() => isSystemThemeModeTemp = value);
             },
             value: isSystemThemeModeTemp,
@@ -104,7 +104,7 @@ class _SettingPageState extends State<SettingPage> {
               '深色主題',
               style: TextStyle(
                 color: CupertinoDynamicColor.resolve(
-                    setting.promptTextColor, context),
+                    Setting.promptTextColor, context),
               ),
             ),
             onChanged: !isSystemThemeModeTemp
