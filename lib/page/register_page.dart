@@ -67,27 +67,26 @@ class _RegisterPageState extends State<RegisterPage> {
               userFocusNode.unfocus();
               passwordFocusNode.unfocus();
               BotToast.showLoading(
+                crossPage: false,
                 animationDuration: Duration(milliseconds: 250),
                 animationReverseDuration: Duration(milliseconds: 250),
                 backButtonBehavior: BackButtonBehavior.none,
                 backgroundColor: CupertinoDynamicColor.resolve(
                     setting.loadingColor, context),
                 duration: Duration(milliseconds: 700),
-                onClose: () => SchedulerBinding.instance.addPostFrameCallback(
-                  (_) async {
-                    // await submit complete and get value
-
-                    // save devices key in device
-
-                    // erase register user id
-                    userText = '';
-                    // give url and user id to login
-                    Navigator.pop(
-                        context, [urlController.text, userController.text]);
-                  },
-                ),
               );
               // submit user id and password to server through url to get devices key
+              Future.delayed(Duration(milliseconds: 350), () async {
+                // await submit complete and get value
+
+                // save devices key in device
+
+                // erase register user id
+                userText = '';
+                // give url and user id to login
+                Navigator.pop(
+                    context, [urlController.text, userController.text]);
+              });
             },
           ),
         ),

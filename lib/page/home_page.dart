@@ -130,22 +130,21 @@ class _HomePageState extends State<HomePage> {
                 BotToast.showText(text: '使用者格式錯誤!');
                 return;
               }
-              // request url connect async value
               BotToast.showLoading(
+                crossPage: false,
                 animationDuration: Duration(milliseconds: 200),
                 animationReverseDuration: Duration(milliseconds: 200),
                 backButtonBehavior: BackButtonBehavior.none,
                 backgroundColor: CupertinoDynamicColor.resolve(
                     setting.loadingColor, context),
                 duration: Duration(milliseconds: 800),
-                onClose: () => WidgetsBinding.instance.addPostFrameCallback(
-                  (_) async {
-                    // await login complete and get value
-                    var result = await updateAndPush(context, ModePage.id);
-                    if (result is String) BotToast.showText(text: result);
-                  },
-                ),
               );
+              // request url connect async value
+              Future.delayed(Duration(milliseconds: 400), () async {
+                // await login complete and get value
+                var result = await updateAndPush(context, ModePage.id);
+                if (result is String) BotToast.showText(text: result);
+              });
             },
             padding: EdgeInsets.symmetric(
               vertical: contentSize.width / 30,
