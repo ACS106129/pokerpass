@@ -2,7 +2,7 @@ import 'package:bot_toast/bot_toast.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:pokerpass/page/PC/pc_page.dart';
+import 'package:pokerpass/page/mode/PC/pc_page.dart';
 import 'package:pokerpass/page/qrcode_page.dart';
 import 'package:pokerpass/setting/setting.dart';
 import 'package:pokerpass/utility/area.dart';
@@ -108,7 +108,7 @@ class _ModePageState extends State<ModePage> {
           // Poker2FA mode
           CupertinoButton(
             child: Text(
-              '2FA(QRCode${Setting.isDesktop ? '產生' : '掃描'})',
+              '二階段(${Setting.isDesktop ? '產生' : '掃描'}QRCode)',
               style: TextStyle(fontSize: 26),
             ),
             color: CupertinoColors.activeGreen,

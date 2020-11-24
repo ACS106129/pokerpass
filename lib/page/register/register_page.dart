@@ -181,7 +181,7 @@ class _RegisterPageState extends State<RegisterPage> {
                     ),
                     SizedBox(height: contentSize.height / 10),
                     CupertinoButton(
-                      child: const Text('完成PC端註冊'),
+                      child: const Text('註冊PC端二階段認證'),
                       color: Setting.connectSessionButtonColor,
                       onPressed: () async {
                         var qrNavFunc = () {

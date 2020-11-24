@@ -6,8 +6,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:pokerpass/setting/user.dart';
 import 'package:pokerpass/page/Setting_page.dart';
-import 'package:pokerpass/page/mode_page.dart';
-import 'package:pokerpass/page/register_page.dart';
+import 'package:pokerpass/page/mode/mode_page.dart';
+import 'package:pokerpass/page/register/register_page.dart';
 import 'package:pokerpass/setting/setting.dart';
 import 'package:pokerpass/utility/utility.dart';
 
