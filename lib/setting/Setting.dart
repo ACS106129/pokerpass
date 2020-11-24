@@ -9,6 +9,7 @@ const userLabel = 'user';
 const urlLabel = 'url';
 const passwordLabel = 'pw';
 const themeLabel = 'theme';
+const deviceKeyName = 'DeviceKey';
 final isDesktop = Platform.isWindows || Platform.isMacOS || Platform.isLinux;
 // regular expression check when inputting
 final userInputRegex = RegExp(r'^[a-zA-Z0-9]{0,20}');
@@ -23,6 +24,10 @@ final bgColor = CupertinoDynamicColor.withBrightness(
   color: Colors.white,
   darkColor: Colors.grey.shade900,
 );
+final connectSessionButtonColor = CupertinoDynamicColor.withBrightness(
+  color: Colors.blue.shade600,
+  darkColor: Colors.blue.shade300,
+);
 final loadingColor = CupertinoDynamicColor.withBrightness(
   color: Colors.black26,
   darkColor: Colors.white10,
@@ -35,9 +40,17 @@ final promptTextColor = CupertinoDynamicColor.withBrightness(
   color: CupertinoColors.black,
   darkColor: CupertinoColors.white,
 );
+final registerButtonColor = CupertinoDynamicColor.withBrightness(
+  color: Colors.black54,
+  darkColor: Colors.white70,
+);
 final iconColor = CupertinoDynamicColor.withBrightness(
   color: Colors.blue.shade600,
   darkColor: Colors.blue.shade300,
+);
+final settingButtonColor = CupertinoDynamicColor.withBrightness(
+  color: Colors.yellow.shade600,
+  darkColor: Colors.yellow.shade300,
 );
 Brightness platformBrightness =
     MediaQueryData.fromWindow(WidgetsBinding.instance.window)

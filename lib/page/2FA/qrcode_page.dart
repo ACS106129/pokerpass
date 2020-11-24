@@ -4,6 +4,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:pokerpass/setting/setting.dart' as setting;
 import 'package:pokerpass/utility/area.dart';
+import 'package:pokerpass/utility/argument/qr_argument.dart';
 import 'package:pokerpass/utility/transmission.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 
@@ -15,11 +16,11 @@ class QRCodePage extends StatefulWidget {
 }
 
 class _QRCodePageState extends State<QRCodePage> {
-  String qrMessage;
+  QRArgument qrArgument;
 
   @override
   Widget build(final BuildContext context) {
-    qrMessage = ModalRoute.of(context).settings.arguments;
+    qrArgument = ModalRoute.of(context).settings.arguments;
     return WillPopScope(
       child: CupertinoPageScaffold(
         navigationBar: const CupertinoNavigationBar(
@@ -43,26 +44,22 @@ class _QRCodePageState extends State<QRCodePage> {
 
   Widget _qrcodePageContent(
       final BuildContext context, final Size contentSize) {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        Container(
-          width: getSafeArea(context).width * 0.8,
-          child: Column(
-            children: [
-              setting.isDesktop
-                  ? QrImage(
-                      data:
-                          'https://www..com/?session=JIFnifaoifjI&random_server=1234567890&random_client=',
-                      version: QrVersions.auto,
-                      size: 200.0,
-                    )
-                  : Text(getHmacValue(
-                      Random().nextInt(1 << 32).toString(), 'asshole')),
-            ],
-          ),
-        ),
-      ],
+    return Container(
+      width: getSafeArea(context).width * 0.8,
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          setting.isDesktop
+              ? QrImage(
+                  data:
+                      'https://www.test.com/?session=JIFnifaoifjI&random_server=1234567890&random_client=',
+                  version: QrVersions.auto,
+                  size: 200.0,
+                )
+              : Text(getHmacValue(
+                  Random().nextInt(1 << 32).toString(), 'asshole')),
+        ],
+      ),
     );
   }
 }

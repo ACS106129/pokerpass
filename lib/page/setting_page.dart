@@ -2,7 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:pokerpass/setting/setting.dart' as setting;
 import 'package:pokerpass/setting/user.dart';
-import 'package:pokerpass/utility/cupertino_swith_list_tile.dart';
+import 'package:pokerpass/utility/widget/cupertino_swith_list_tile.dart';
 
 class SettingPage extends StatefulWidget {
   static const id = 'setting_page';

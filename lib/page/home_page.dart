@@ -117,10 +117,7 @@ class _HomePageState extends State<HomePage> {
           SizedBox(height: contentSize.height / 10),
           CupertinoButton(
             child: const Text('建立Session連線'),
-            color: CupertinoDynamicColor.withBrightness(
-              color: Colors.blue.shade600,
-              darkColor: Colors.blue.shade300,
-            ),
+            color: setting.connectSessionButtonColor,
             onPressed: () async {
               if (!setting.urlRegex.hasMatch(urlController.text)) {
                 BotToast.showText(text: '網址格式錯誤!');
@@ -139,7 +136,7 @@ class _HomePageState extends State<HomePage> {
                     setting.loadingColor, context),
                 duration: Duration(milliseconds: 800),
               );
-              // request url connect async value
+              // await request url connect value
               Future.delayed(Duration(milliseconds: 400), () async {
                 // await login complete and get value
                 var result = await updateAndPush(context, ModePage.id);
@@ -156,10 +153,7 @@ class _HomePageState extends State<HomePage> {
             children: [
               CupertinoButton(
                 child: const Text('設定'),
-                color: CupertinoDynamicColor.withBrightness(
-                  color: Colors.yellow.shade600,
-                  darkColor: Colors.yellow.shade300,
-                ),
+                color: setting.settingButtonColor,
                 onPressed: () async {
                   var result = await updateAndPush(context, SettingPage.id);
                   if (result is String) BotToast.showText(text: result);
@@ -172,10 +166,7 @@ class _HomePageState extends State<HomePage> {
               SizedBox(width: contentSize.width / 20),
               CupertinoButton(
                 child: const Text('註冊'),
-                color: CupertinoDynamicColor.withBrightness(
-                  color: Colors.black54,
-                  darkColor: Colors.white70,
-                ),
+                color: setting.registerButtonColor,
                 onPressed: () async {
                   var result = await updateAndPush(context, RegisterPage.id);
                   if (result is List && result.length >= 2) {

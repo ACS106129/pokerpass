@@ -1,7 +1,6 @@
 import 'package:bot_toast/bot_toast.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/scheduler.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:pokerpass/page/2FA/qrcode_page.dart';
 import 'package:pokerpass/page/PC/pc_page.dart';
@@ -155,9 +154,10 @@ class _ModePageState extends State<ModePage> {
                     duration: Duration(milliseconds: 800),
                   );
                   Future.delayed(Duration(milliseconds: 200), () async {
+                    var scanResult = await scan();
                     var result = await Navigator.pushNamed(
                         context, QRCodePage.id,
-                        arguments: await scan());
+                        arguments: scanResult);
                     if (result is String) BotToast.showText(text: result);
                   });
                 };
