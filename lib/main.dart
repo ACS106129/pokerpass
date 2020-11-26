@@ -15,10 +15,7 @@ import 'package:pokerpass/setting/user.dart';
 import 'package:window_size/window_size.dart';
 
 void main() async {
-  // initialize
   WidgetsFlutterBinding.ensureInitialized();
-  await Flame.images
-      .loadAll(['spade.png', 'heart.png', 'diamond.png', 'club.png']);
   // windows sizebox will be disabled, others preserve it
   if (Setting.isDesktop) {
     setWindowTitle('PokerPass');
@@ -29,6 +26,9 @@ void main() async {
     setWindowMinSize(Size(Setting.width, Setting.height));
     setWindowMaxSize(Size(Setting.width, Setting.height));
   }
+  // load media
+  await Flame.images
+      .loadAll(['spade.png', 'heart.png', 'diamond.png', 'club.png']);
   runApp(PokerPassApp());
 }
 

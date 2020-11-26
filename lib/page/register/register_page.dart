@@ -7,6 +7,7 @@ import 'package:pokerpass/page/qrcode_page.dart';
 import 'package:pokerpass/setting/setting.dart';
 import 'package:pokerpass/setting/user.dart';
 import 'package:pokerpass/utility/argument/qr_argument.dart';
+import 'package:pokerpass/utility/transmission.dart';
 import 'package:pokerpass/utility/utility.dart';
 import 'package:qrscan/qrscan.dart';
 
@@ -111,26 +112,45 @@ class _RegisterPageState extends State<RegisterPage> {
                   passwordFocusNode.unfocus();
                   Utility.loading(Duration(milliseconds: 1200), context);
                   // submit user id and password to server through url, then get device key and session id
-                  final String deviceKey = '123456';
-                  final String sessionId = 'abc';
+                  final isAccept = RegisterResponse.Accept;
+                  final deviceKey = '123456';
+                  final sessionId = 'abc';
                   Future.delayed(Duration(milliseconds: 350), () async {
-                    // save device key in mobile device
-                    if (!Setting.isDesktop)
-                      await UserData.usePrefs((prefs) =>
-                          prefs.setString(Setting.deviceKeyName, deviceKey));
-                    else {
-                      // generate qrcode to mobile
-                      var result =
-                          await Navigator.pushNamed(context, QRCodePage.id,
-                              arguments: QRArgument(
-                                ProcessType.Register,
-                                url: urlController.text,
-                                user: userController.text,
-                                password: passwordController.text,
-                                sessionId: sessionId,
-                                deviceKey: deviceKey,
-                              ));
-                      if (result is String) BotToast.showText(text: result);
+                    switch (isAccept) {
+                      case RegisterResponse.Accept:
+                        if (!Setting.isDesktop)
+                          // save device key and url in mobile device
+                          UserData.storage.write(
+                              key:
+                                  '${Setting.deviceKeyName}-${urlController.text}',
+                              value: deviceKey);
+                        else {
+                          // generate qrcode to mobile
+                          var result =
+                              await Navigator.pushNamed(context, QRCodePage.id,
+                                  arguments: QRArgument(
+                                    ProcessType.Register,
+                                    url: urlController.text,
+                                    user: userController.text,
+                                    password: passwordController.text,
+                                    sessionId: sessionId,
+                                    deviceKey: deviceKey,
+                                  ));
+                          if (result is String) BotToast.showText(text: result);
+                        }
+                        break;
+                      case RegisterResponse.AccountExist:
+                        BotToast.closeAllLoading();
+                        BotToast.showText(text: '註冊帳號已存在');
+                        break;
+                      case RegisterResponse.Deny:
+                        BotToast.closeAllLoading();
+                        BotToast.showText(text: '註冊遭拒');
+                        break;
+                      default:
+                        BotToast.closeAllLoading();
+                        BotToast.showText(text: '註冊請求失敗');
+                        break;
                     }
                     // erase register user id
                     userText = '';
@@ -182,20 +202,18 @@ class _RegisterPageState extends State<RegisterPage> {
                     SizedBox(height: contentSize.height / 10),
                     CupertinoButton(
                       child: const Text('註冊PC端二階段認證'),
-                      color: Setting.connectSessionButtonColor,
+                      color: Setting.iconColor,
                       onPressed: () async {
-                        var qrNavFunc = () {
-                          Utility.loading(Duration(milliseconds: 1200), context);
-                          Future.delayed(Duration(milliseconds: 200), () async {
-                            var scanResult = await scan();
-                            // deal result into QRArgument
-                            var result = await Navigator.pushNamed(
-                                context, QRCodePage.id,
-                                arguments: QRArgument(ProcessType.Register,
-                                    url: scanResult));
-                            if (result is String)
-                              BotToast.showText(text: result);
-                          });
+                        var qrNavFunc = () async {
+                          Utility.loading(
+                              Duration(milliseconds: 1200), context);
+                          var scanResult = await scan();
+                          // deal result into QRArgument
+                          var result = await Navigator.pushNamed(
+                              context, QRCodePage.id,
+                              arguments: QRArgument(ProcessType.Register,
+                                  url: scanResult));
+                          if (result is String) BotToast.showText(text: result);
                         };
                         if (await Permission.camera.status.isGranted)
                           qrNavFunc();
@@ -261,7 +279,7 @@ class _RegisterPageState extends State<RegisterPage> {
           case Setting.passwordLabel:
             return passwordController;
           default:
-            throw new Exception('Label $label Error!');
+            throw ArgumentError('Label:$label Error!');
         }
       })(),
       decoration: BoxDecoration(

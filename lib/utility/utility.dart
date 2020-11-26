@@ -7,7 +7,7 @@ class Utility {
   static void loading(final Duration duration, final BuildContext context,
       {final double mainScale = 0.6}) {
     if (mainScale > 1 || mainScale < 0)
-      throw ArgumentError('arg mainScale:$mainScale error!');
+      throw ArgumentError('mainScale:$mainScale error!');
     final subScaleDuration = Duration(
         milliseconds: (duration.inMilliseconds * (1 - mainScale) / 2).round());
     BotToast.showLoading(

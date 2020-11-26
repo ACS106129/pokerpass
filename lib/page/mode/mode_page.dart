@@ -114,17 +114,14 @@ class _ModePageState extends State<ModePage> {
             color: CupertinoColors.activeGreen,
             onPressed: () async {
               if (!Setting.isDesktop) {
-                var qrNavFunc = () {
+                var qrNavFunc = () async {
                   Utility.loading(Duration(milliseconds: 1200), context);
-                  Future.delayed(Duration(milliseconds: 200), () async {
-                    var scanResult = await scan();
-                    // deal 2FA result into QRArgument
-                    var result = await Navigator.pushNamed(
-                        context, QRCodePage.id,
-                        arguments:
-                            QRArgument(ProcessType.TwoFA, url: scanResult));
-                    if (result is String) BotToast.showText(text: result);
-                  });
+                  var scanResult = await scan();
+                  // deal 2FA result into QRArgument
+                  var result = await Navigator.pushNamed(context, QRCodePage.id,
+                      arguments:
+                          QRArgument(ProcessType.TwoFA, url: scanResult));
+                  if (result is String) BotToast.showText(text: result);
                 };
                 if (await Permission.camera.status.isGranted)
                   qrNavFunc();

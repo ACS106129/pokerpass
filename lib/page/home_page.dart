@@ -29,6 +29,16 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
+    // load user data from storage
+    UserData.usePrefs((prefs) {
+      UserData.isSystemThemeMode =
+          prefs.get(Setting.systemThemeModeName) ?? true;
+      final isDarkThemeMode = prefs.get(Setting.darkThemeModeName) ?? null;
+      if (!UserData.isSystemThemeMode && isDarkThemeMode is bool)
+        UserData.brightness
+            .add(isDarkThemeMode ? Brightness.dark : Brightness.light);
+    });
+    // add platform brightness changed listener
     WidgetsBinding.instance.window.onPlatformBrightnessChanged = () {
       Config.platformBrightness = window.platformBrightness;
       if (UserData.isSystemThemeMode)
@@ -38,11 +48,17 @@ class _HomePageState extends State<HomePage> {
 
   @override
   void dispose() {
+    // save user data into storage
+    UserData.usePrefs((prefs) {
+      prefs.setBool(Setting.systemThemeModeName, UserData.isSystemThemeMode);
+      prefs.setBool(
+          Setting.darkThemeModeName, UserData.snapshot.data == Brightness.dark);
+    });
+    // dispose here
     urlController.dispose();
     userController.dispose();
     urlFocusNode.dispose();
     userFocusNode.dispose();
-    UserData.brightness.sink.close();
     super.dispose();
   }
 
@@ -116,7 +132,7 @@ class _HomePageState extends State<HomePage> {
           SizedBox(height: contentSize.height / 10),
           CupertinoButton(
             child: const Text('建立Session連線'),
-            color: Setting.connectSessionButtonColor,
+            color: Setting.iconColor,
             onPressed: () async {
               if (!Setting.urlRegex.hasMatch(urlController.text)) {
                 BotToast.showText(text: '網址格式錯誤!');
@@ -200,7 +216,7 @@ class _HomePageState extends State<HomePage> {
           case Setting.userLabel:
             return userController;
           default:
-            throw new Exception('Label $label Error!');
+            throw ArgumentError('Label:$label Error!');
         }
       })(),
       cursorColor: CupertinoDynamicColor.resolve(Setting.iconColor, context),

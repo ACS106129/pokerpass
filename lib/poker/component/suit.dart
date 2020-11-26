@@ -16,6 +16,6 @@ String toImagePath(final Suit suit) {
     case Suit.Club:
       return 'club.png';
     default:
-      throw new Exception('Suit $suit Error!');
+      throw ArgumentError('Suit:$suit Error!');
   }
 }

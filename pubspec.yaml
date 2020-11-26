@@ -32,6 +32,7 @@ dependencies:
       ref: 5b3b930da18244ecf2a7140a0e33a9892273797c
   permission_handler: ^5.0.1+1
   shared_preferences: ^0.5.12+4
+  flutter_secure_storage: ^3.3.5
   bot_toast: ^3.0.5
   qr_flutter: ^3.1.0
   qrscan: ^0.2.17

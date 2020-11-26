@@ -11,13 +11,15 @@ class Setting {
   static const passwordLabel = 'pw';
   static const themeLabel = 'theme';
   static const deviceKeyName = 'DeviceKey';
+  static const systemThemeModeName = 'SystemThemeMode';
+  static const darkThemeModeName = 'DarkThemeMode';
   static final isDesktop =
       Platform.isWindows || Platform.isMacOS || Platform.isLinux;
-// regular expression check when inputting
+  // regular expression check when inputting
   static final userInputRegex = RegExp(r'^[a-zA-Z0-9]{0,20}');
   static final passwordInputRegex = RegExp(r'^[a-zA-Z0-9]{0,15}');
   static final urlInputRegex = RegExp(r'^[-a-zA-Z0-9@:%._\+~#=&?/()]{0,320}');
-// regular expression check finish input
+  // regular expression check finish input
   static final userRegex = RegExp(r'^[a-zA-Z0-9]{8,20}');
   static final passwordRegex = RegExp(r'^[a-zA-Z0-9]{8,15}');
   static final urlRegex = RegExp(
@@ -25,10 +27,6 @@ class Setting {
   static final bgColor = CupertinoDynamicColor.withBrightness(
     color: Colors.white,
     darkColor: Colors.grey.shade900,
-  );
-  static final connectSessionButtonColor = CupertinoDynamicColor.withBrightness(
-    color: Colors.blue.shade600,
-    darkColor: Colors.blue.shade300,
   );
   static final loadingColor = CupertinoDynamicColor.withBrightness(
     color: Colors.black26,
