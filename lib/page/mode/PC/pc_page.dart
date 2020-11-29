@@ -1,5 +1,8 @@
+
+import 'package:bot_toast/bot_toast.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:pokerpass/poker/poker.dart';
+import 'package:pokerpass/setting/setting.dart';
 import 'package:pokerpass/utility/utility.dart';
 
 class PCPage extends StatefulWidget {
@@ -10,13 +13,43 @@ class PCPage extends StatefulWidget {
 }
 
 class _PCPageState extends State<PCPage> {
+  final passwordController = TextEditingController(text: '');
+  var contentPageNumber = 1;
+
+  @override
+  void dispose() {
+    passwordController.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(final BuildContext context) {
     return WillPopScope(
       child: CupertinoPageScaffold(
         navigationBar: CupertinoNavigationBar(
-          previousPageTitle: '中止',
-          middle: const Text('PokerPC'),
+          previousPageTitle: contentPageNumber == 1 ? '中止' : '上一步',
+          middle: Text('PokerPC ($contentPageNumber/2)'),
+          trailing: GestureDetector(
+            onTap: () {
+              if (contentPageNumber == 1) {
+                if (!Setting.pokerPCPasswordRegex
+                    .hasMatch(passwordController.text)) {
+                  BotToast.showText(text: '通行碼格式錯誤');
+                  return;
+                }
+                setState(() => contentPageNumber += 1);
+                return;
+              }
+              // submit result
+            },
+            child: Text(
+              contentPageNumber == 1 ? '下一步' : '送出',
+              style: TextStyle(
+                color: CupertinoDynamicColor.resolve(
+                    CupertinoColors.activeGreen, context),
+              ),
+            ),
+          ),
         ),
         child: SafeArea(
           child: Center(
@@ -28,6 +61,10 @@ class _PCPageState extends State<PCPage> {
         ),
       ),
       onWillPop: () async {
+        if (contentPageNumber != 1) {
+          setState(() => contentPageNumber -= 1);
+          return false;
+        }
         await showCupertinoDialog(
           context: context,
           builder: (context) => CupertinoAlertDialog(
@@ -58,6 +95,30 @@ class _PCPageState extends State<PCPage> {
   }
 
   Widget pcPageContent(final BuildContext context, final Size contentSize) {
-    return PokerGame(contentSize).widget;
+    switch (contentPageNumber) {
+      case 1:
+        return Container(
+          width: contentSize.width * 0.7,
+          child: CupertinoTextField(
+            controller: passwordController,
+            placeholder: '請輸入通行碼前四位',
+            placeholderStyle: TextStyle(
+              fontWeight: FontWeight.w400,
+              color: CupertinoDynamicColor.resolve(
+                  Setting.placeholderColor, context),
+            ),
+            style: TextStyle(
+              height: 1.5,
+            ),
+            maxLength: 4,
+            autofocus: true,
+            obscureText: true,
+          ),
+        );
+      case 2:
+        return PokerGame(contentSize, 153643).widget;
+      default:
+        throw ArgumentError('ContentPageNumber:$contentPageNumber error!');
+    }
   }
 }

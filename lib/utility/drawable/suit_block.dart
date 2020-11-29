@@ -5,17 +5,26 @@ import 'package:flutter/cupertino.dart';
 import 'package:pokerpass/poker/component/suit.dart';
 
 class SuitBlock {
-  final Suit suit;
   final Position position;
   final Size size;
+  Suit _suit;
   Sprite _suitSprite;
 
-  SuitBlock(final this.suit, {final this.position, final this.size})
-      : _suitSprite = Sprite.fromImage(
-            Flame.images.loadedFiles[toImagePath(suit)].loadedImage);
+  set suit(final Suit suit) {
+    _suit = suit;
+    _suitSprite = Sprite.fromImage(
+        Flame.images.loadedFiles[toImagePath(_suit)].loadedImage);
+  }
+
+  Suit get suit => _suit;
+
+  SuitBlock(final Suit suit, {final this.position, final this.size}) {
+    this.suit = suit;
+  }
 
   void render(final Canvas canvas, {final Position position, final Size size}) {
-    _suitSprite.renderPosition(canvas, position ?? this.position ?? Position.empty(),
+    _suitSprite.renderPosition(
+        canvas, position ?? this.position ?? Position.empty(),
         size: Position.fromSize(size ?? this.size ?? Size.zero));
   }
 }

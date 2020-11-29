@@ -4,11 +4,11 @@ import 'package:bot_toast/bot_toast.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:pokerpass/setting/user.dart';
 import 'package:pokerpass/page/Setting_page.dart';
 import 'package:pokerpass/page/mode/mode_page.dart';
 import 'package:pokerpass/page/register/register_page.dart';
 import 'package:pokerpass/setting/setting.dart';
+import 'package:pokerpass/setting/user.dart';
 import 'package:pokerpass/utility/utility.dart';
 
 class HomePage extends StatefulWidget {
@@ -146,7 +146,8 @@ class _HomePageState extends State<HomePage> {
               // await request url connect value
               Future.delayed(Duration(milliseconds: 400), () async {
                 // await login complete and get value
-                var result = await updateAndPush(context, ModePage.id);
+                var result = await updateAndPush(context, ModePage.id,
+                    arguments: [urlController.text, userController.text]);
                 if (result is String) BotToast.showText(text: result);
               });
             },

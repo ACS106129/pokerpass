@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:local_auth/local_auth.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class UserCache {}
@@ -17,7 +18,7 @@ class UserData {
   /// 
   /// user device key: DeviceKey-url-userId
   static final storage = FlutterSecureStorage();
-
+  static final localAuth = LocalAuthentication();
   /// used to store user-defined preferences
   static usePrefs(Function(SharedPreferences) prefsFunc) async {
     final prefs = await SharedPreferences.getInstance();

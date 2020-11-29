@@ -1,10 +1,12 @@
 import 'package:bot_toast/bot_toast.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:local_auth/auth_strings.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:pokerpass/page/mode/PC/pc_page.dart';
 import 'package:pokerpass/page/qrcode_page.dart';
 import 'package:pokerpass/setting/setting.dart';
+import 'package:pokerpass/setting/user.dart';
 import 'package:pokerpass/utility/area.dart';
 import 'package:pokerpass/utility/argument/qr_argument.dart';
 import 'package:pokerpass/utility/utility.dart';
@@ -18,6 +20,8 @@ class ModePage extends StatefulWidget {
 }
 
 class _ModePageState extends State<ModePage> {
+  List<String> userInfo;
+
   @override
   void initState() {
     super.initState();
@@ -26,6 +30,7 @@ class _ModePageState extends State<ModePage> {
 
   @override
   Widget build(final BuildContext context) {
+    userInfo = ModalRoute.of(context).settings.arguments;
     return WillPopScope(
       child: CupertinoPageScaffold(
         navigationBar: const CupertinoNavigationBar(
@@ -97,7 +102,35 @@ class _ModePageState extends State<ModePage> {
                       if (result is String) BotToast.showText(text: result);
                     });
                   }
-                : () async {},
+                : () async {
+                    if (await UserData.localAuth.canCheckBiometrics) {
+                      final isAuthed =
+                          await UserData.localAuth.authenticateWithBiometrics(
+                        localizedReason: '用生物辨識啟用裝置碼',
+                        stickyAuth: true,
+                        androidAuthStrings: AndroidAuthMessages(
+                          fingerprintHint: '啟用裝置碼',
+                          fingerprintRequiredTitle: '需要生物辨識',
+                          fingerprintNotRecognized: '辨識失敗',
+                          fingerprintSuccess: '成功',
+                          cancelButton: '取消',
+                          goToSettingsButton: '移至設定',
+                          goToSettingsDescription: '生物辨識未設定\n請設定生物辨識功能',
+                        ),
+                        iOSAuthStrings: IOSAuthMessages(
+                          lockOut: '請啟用生物辨識',
+                          cancelButton: '取消',
+                          goToSettingsButton: '移至設定',
+                          goToSettingsDescription: '生物辨識未設定\n請設定生物辨識功能',
+                        ),
+                      );
+                      if (isAuthed) {
+                        final deviceKey = await UserData.storage.read(
+                            key: '${Setting.deviceKeyName}-${userInfo[0]}');
+                        print(deviceKey);
+                      }
+                    }
+                  },
             padding: EdgeInsets.symmetric(
               vertical: contentSize.height / 20,
             ),
