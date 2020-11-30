@@ -31,28 +31,28 @@ class _HomePageState extends State<HomePage> {
     super.initState();
     // load user data from storage
     UserData.usePrefs((prefs) {
-      UserData.isSystemThemeMode =
-          prefs.get(Setting.systemThemeModeName) ?? true;
-      final isDarkThemeMode = prefs.get(Setting.darkThemeModeName) ?? null;
-      if (!UserData.isSystemThemeMode && isDarkThemeMode is bool)
-        UserData.brightness
+      UserCache.isSystemThemeMode =
+          prefs.getBool(Setting.systemThemeModeName) ?? true;
+      final isDarkThemeMode = prefs.getBool(Setting.darkThemeModeName) ?? null;
+      if (!UserCache.isSystemThemeMode && isDarkThemeMode is bool)
+        Config.brightnessStream
             .add(isDarkThemeMode ? Brightness.dark : Brightness.light);
     });
     // add platform brightness changed listener
     WidgetsBinding.instance.window.onPlatformBrightnessChanged = () {
       Config.platformBrightness = window.platformBrightness;
-      if (UserData.isSystemThemeMode)
-        UserData.brightness.add(window.platformBrightness);
+      if (UserCache.isSystemThemeMode)
+        Config.brightnessStream.add(window.platformBrightness);
     };
   }
 
   @override
   void dispose() {
-    // save user data into storage
+    // save user data into local storage
     UserData.usePrefs((prefs) {
-      prefs.setBool(Setting.systemThemeModeName, UserData.isSystemThemeMode);
+      prefs.setBool(Setting.systemThemeModeName, UserCache.isSystemThemeMode);
       prefs.setBool(
-          Setting.darkThemeModeName, UserData.snapshot.data == Brightness.dark);
+          Setting.darkThemeModeName, UserCache.snapshot.data == Brightness.dark);
     });
     // dispose here
     urlController.dispose();

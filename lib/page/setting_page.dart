@@ -12,8 +12,8 @@ class SettingPage extends StatefulWidget {
 }
 
 class _SettingPageState extends State<SettingPage> {
-  var isDarkThemeModeTemp = UserData.snapshot.data == Brightness.dark;
-  var isSystemThemeModeTemp = UserData.isSystemThemeMode;
+  var isDarkThemeModeTemp = UserCache.snapshot.data == Brightness.dark;
+  var isSystemThemeModeTemp = UserCache.isSystemThemeMode;
 
   @override
   Widget build(final BuildContext context) {
@@ -23,11 +23,6 @@ class _SettingPageState extends State<SettingPage> {
           previousPageTitle: '取消',
           middle: const Text('設定'),
           trailing: GestureDetector(
-            onTap: () {
-              // finish user configuration
-              UserData.isSystemThemeMode = isSystemThemeModeTemp;
-              Navigator.pop(context, '已保存');
-            },
             child: Text(
               '完成',
               style: TextStyle(
@@ -35,6 +30,11 @@ class _SettingPageState extends State<SettingPage> {
                     CupertinoColors.activeGreen, context),
               ),
             ),
+            onTap: () {
+              // finish user configuration
+              UserCache.isSystemThemeMode = isSystemThemeModeTemp;
+              Navigator.pop(context, '已保存');
+            },
           ),
         ),
         child: SafeArea(
@@ -47,7 +47,7 @@ class _SettingPageState extends State<SettingPage> {
         ),
       ),
       onWillPop: () async {
-        UserData.brightness.add(UserData.isSystemThemeMode
+        Config.brightnessStream.add(UserCache.isSystemThemeMode
             ? Config.platformBrightness
             : isDarkThemeModeTemp
                 ? Brightness.dark
@@ -94,7 +94,7 @@ class _SettingPageState extends State<SettingPage> {
                       Setting.promptTextColor, context),
                 )),
             onChanged: (value) {
-              if (value) UserData.brightness.add(Config.platformBrightness);
+              if (value) Config.brightnessStream.add(Config.platformBrightness);
               setState(() => isSystemThemeModeTemp = value);
             },
             value: isSystemThemeModeTemp,
@@ -108,10 +108,10 @@ class _SettingPageState extends State<SettingPage> {
               ),
             ),
             onChanged: !isSystemThemeModeTemp
-                ? (value) => UserData.brightness
+                ? (value) => Config.brightnessStream
                     .add(value ? Brightness.dark : Brightness.light)
                 : null,
-            value: UserData.snapshot.data == Brightness.dark,
+            value: UserCache.snapshot.data == Brightness.dark,
           ),
         ],
       ),

@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/cupertino.dart';
@@ -66,6 +67,9 @@ class Setting {
 }
 
 class Config {
+  // ignore: close_sinks
+  static final StreamController<Brightness> brightnessStream =
+      StreamController.broadcast();
   static Brightness platformBrightness =
       MediaQueryData.fromWindow(WidgetsBinding.instance.window)
           .platformBrightness;

@@ -37,9 +37,9 @@ class PokerPassApp extends StatelessWidget {
   Widget build(final BuildContext context) {
     return StreamBuilder<Brightness>(
       initialData: Config.platformBrightness,
-      stream: UserData.brightness.stream,
+      stream: Config.brightnessStream.stream,
       builder: (context, snapshot) {
-        UserData.snapshot = snapshot;
+        UserCache.snapshot = snapshot;
         return CupertinoApp(
           title: 'PokerPass',
           theme: CupertinoThemeData(
