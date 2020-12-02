@@ -12,33 +12,61 @@ import 'package:pokerpass/poker/component/response_block.dart';
 import 'package:pokerpass/poker/component/suit.dart';
 import 'package:pokerpass/utility/drawable/suit_block.dart';
 import 'package:pokerpass/utility/drawable/text_block.dart';
+import 'package:pokerpass/utility/event/button_events.dart';
 
-class PokerGame extends Game with KeyboardEvents {
+class PokerGame extends Game with KeyboardEvents, ButtonEvents {
   final pokerCardSize = Size(50, 50);
   final Size screenSize;
   final responseBlocks = <ResponseBlock>[];
   final charBlocks = <TextBlock>[];
   final suitBlocks = <SuitBlock>[];
   final Random random;
-  int firstchallenge,secondchallenge;
+  int firstchallenge, secondchallenge;
   TextBlock textBlock;
   bool suitcheck = false;
+  bool firstphase = false;
   bool secondphase = false;
-  PokerGame(final this.screenSize, final int seedValue)
+  bool checkpass = true;
+  bool challengecheck1 = false;
+  bool challengecheck2 = false;
+  List shuffledsuit = [];
+  String security = "security";
+  int count = 4;
+  int phase = 1;
+  List<String> challengestring = [
+    'A',
+    '2',
+    '3',
+    '4',
+    '5',
+    '6',
+    '7',
+    '8',
+    '9',
+    '10',
+    'J',
+    'Q',
+    'K'
+  ];
+  PokerGame(final this.screenSize, final int seedValue, final String password)
       : random = Random(seedValue) {
+    if (password == security.substring(0, 4)) firstphase = true;
     final Util flameUtil = Util();
     flameUtil.setOrientation(DeviceOrientation.portraitUp);
     flameUtil.fullScreen();
-    firstchallenge=random.nextInt(13);
-    secondchallenge=random.nextInt(13);
-    textBlock = TextBlock('一階段挑戰碼' + firstchallenge.toString() +',二階段挑戰碼'+secondchallenge.toString(),
+    firstchallenge = random.nextInt(13);
+    secondchallenge = random.nextInt(13);
+    textBlock = TextBlock(
+        '一階段挑戰碼' +
+            challengestring[firstchallenge - 1] +
+            '\n二階段挑戰碼' +
+            challengestring[secondchallenge - 1],
         style: TextStyle(
           color: Colors.blue,
           fontSize: 20,
         ));
-    List a = List.filled(24, Suit.values);
+    List a = List.filled(24, Suit.values); //a is a variable before shuffle
     List number = new List();
-    List c = new List();
     for (int i = 0; i < 4; i++) {
       List origin = List.filled(1, numberList); // A ~ K
       List sforigin = new List();
@@ -49,16 +77,16 @@ class PokerGame extends Game with KeyboardEvents {
       for (int j = 0; j < 12; j++) number.add(sforigin[j]);
     }
     a.forEach((item) {
-      c.addAll(item);
+      shuffledsuit.addAll(item);
     });
-    c.shuffle();
+    shuffledsuit.shuffle();
     for (int row = 0, index = 0; row < 4; row++) {
       for (int col = 0; col < 12; col++, index += 2) {
         final resBlockPos = Position(
             screenSize.width / 13 * (col + 1) - pokerCardSize.width / 2,
             screenSize.height / 5 * (row + 1) - pokerCardSize.height / 2);
-        responseBlocks.add(ResponseBlock(
-            charList[index], c[index], charList[index + 1], c[index + 1],
+        responseBlocks.add(ResponseBlock(charList[index], shuffledsuit[index],
+            charList[index + 1], shuffledsuit[index + 1],
             x: resBlockPos.x,
             y: resBlockPos.y,
             width: pokerCardSize.width,
@@ -93,30 +121,71 @@ class PokerGame extends Game with KeyboardEvents {
     canvas.drawRect(bgRect, paint);
     // target below
     responseBlocks.forEach((charBlock) => charBlock.render(canvas));
-    charBlocks.forEach((charBlock) => charBlock.render(canvas));
     suitBlocks.forEach((suitBlock) => suitBlock.render(canvas));
-    textBlock.render(canvas);
+    if (phase == 2) {
+      charBlocks.forEach((charBlock) => charBlock.render(canvas));
+      textBlock.render(canvas);
+    }
   }
 
   @override
   void update(double t) {
+    if (phase == 2 && checkpass == true)
+      secondphase = true;
+    else
+      secondphase = false;
     // textfield password 4 chars
-    // phase 1 remain chars  if success >> secondphase=true
+    // phase 1 remain chars if success >> secondphase=true
     // phase 2 challenge codes
   }
 
   @override
-  void onKeyEvent(e) {
-    final bool isKeyDown = e is RawKeyDownEvent;
-    print(" Key: ${e.data.keyLabel} - isKeyDown: $isKeyDown");
-    if (e.isKeyPressed(LogicalKeyboardKey.arrowUp)) {
+  void onButtonEvent(ButtonEvent e) {
+    if (e.state == ButtonState.Press && e.name == "輸入" && phase == 1) {
+      if (shuffledsuit[charList.indexOf(security[count])] !=
+          suitBlocks[(charList.indexOf(security[count]) / 24).floor()].suit)
+        checkpass = false;
+      count++;
+    } else if (e.state == ButtonState.Press && e.name == "清除" && phase == 1) {
+      checkpass = true;
+      count = 4;
+    } else if (e.state == ButtonState.Press && e.name == "輸入" && phase == 2) {
+      checkChallengeCode(security, 1);
+    }
+  }
+
+  void checkChallengeCode(final String password, final int checkOrder) {
+    var res = responseBlocks[(charList.indexOf(password[4]) / 2).floor()];
+    int targetSuitIndex;
+    if (charList.indexOf(password[4]) % 2 == 0)
+      targetSuitIndex = suitBlocks
+          .indexWhere((element) => element.suit == res.lowerSuitBlock.suit);
+    else
+      targetSuitIndex = suitBlocks
+          .indexWhere((element) => element.suit == res.upperSuitBlock.suit);
+    var passwordPosition =
+        (charList.indexOf(password[password.length - checkOrder]) / 2).floor();
+    var targetChar =
+        charBlocks[passwordPosition % 12 + 12 * targetSuitIndex].text.trim();
+    var challenge = checkOrder == 1 ? firstchallenge : secondchallenge;
+    if (targetChar == challengestring[challenge - 1] ||
+        targetChar == challengestring[challenge % 13])
+      checkOrder == 1 ? challengecheck1 = true : challengecheck2 = true;
+  }
+
+  @override
+  void onKeyEvent(RawKeyEvent e) {
+    //final bool isKeyDown = e is RawKeyDownEvent;
+    //print(" Key: ${e.data.keyLabel} - isKeyDown: $isKeyDown");
+    if (e.isKeyPressed(LogicalKeyboardKey.arrowUp) && firstphase == true) {
       var texts = charBlocks.map((e) => e.text).toList();
       var index = (texts.length / 4).floor();
       var suits = suitBlocks.map((e) => e.suit).toList();
       var index2 = 1;
       charBlocks.forEach((e) => e.text = texts[index++ % texts.length]);
       suitBlocks.forEach((e) => e.suit = suits[index2++ % suits.length]);
-    } else if (e.isKeyPressed(LogicalKeyboardKey.arrowDown)) {
+    } else if (e.isKeyPressed(LogicalKeyboardKey.arrowDown) &&
+        firstphase == true) {
       var texts = charBlocks.map((e) => e.text).toList();
       var index = (texts.length * 3 / 4).floor();
       var suits = suitBlocks.map((e) => e.suit).toList();

@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:bot_toast/bot_toast.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:pokerpass/setting/setting.dart';
@@ -20,5 +22,13 @@ class Utility {
       duration:
           Duration(milliseconds: (duration.inMilliseconds * mainScale).round()),
     );
+  }
+
+  static String base64Encode(final String str) {
+    return base64.encode(utf8.encode(str));
+  }
+
+  static String base64Decode(final String str) {
+    return utf8.decode(base64.decode(str));
   }
 }

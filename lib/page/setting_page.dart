@@ -12,7 +12,7 @@ class SettingPage extends StatefulWidget {
 }
 
 class _SettingPageState extends State<SettingPage> {
-  var isDarkThemeModeTemp = UserCache.snapshot.data == Brightness.dark;
+  final isDarkThemeModeTemp = UserCache.snapshot.data == Brightness.dark;
   var isSystemThemeModeTemp = UserCache.isSystemThemeMode;
 
   @override

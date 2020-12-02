@@ -20,17 +20,19 @@ class Setting {
   static final userInputRegex = RegExp(r'^[a-zA-Z0-9]{0,20}');
   static final passwordInputRegex = RegExp(r'^[a-zA-Z0-9 \./<>?;:\"' +
       r"\'" +
-      r'`!@#\$%^&*()\[\]{}_\+=|\\-~]{0,15}');
+      r'`!@#\$%^&*()\[\]{}_\+=|\\\-~]{0,15}');
   static final urlInputRegex = RegExp(r'^[-a-zA-Z0-9@:%._\+~#=&?/()]{0,320}');
+  static final pokerPCPasswordInputRegex = RegExp(
+      r'^[a-zA-Z0-9 \.,/<>?;:\"`!@#\$%^&*()\[\]{}_\\+=|\\\-~' + r"\']{0,4}");
   // regular expression check finish input
   static final userRegex = RegExp(r'^[a-zA-Z0-9]{8,20}');
   static final passwordRegex = RegExp(r'^[a-zA-Z0-9 \./<>?;:\"' +
       r"\'" +
-      r'`!@#\$%^&*()\[\]{}_\+=|\\-~]{8,15}');
+      r'`!@#\$%^&*()\[\]{}_\+=|\\\-~]{8,15}');
   static final urlRegex = RegExp(
       r'^(https?:\/\/(www\.)?)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)');
   static final pokerPCPasswordRegex = RegExp(
-      r'^[a-zA-Z0-9 \./<>?;:\"' + r"\'" + r'`!@#\$%^&*()\[\]{}_\+=|\\-~]{4}');
+      r'^[a-zA-Z0-9 \.,/<>?;:\"`!@#\$%^&*()\[\]{}_\\+=|\\\-~' + r"\']{4}");
   // dynamic color list
   static final bgColor = CupertinoDynamicColor.withBrightness(
     color: Colors.white,

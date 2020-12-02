@@ -1,4 +1,3 @@
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:pokerpass/setting/setting.dart';
@@ -18,7 +17,8 @@ class _QRCodePageState extends State<QRCodePage> {
 
   @override
   Widget build(final BuildContext context) {
-    qrArgument = ModalRoute.of(context).settings.arguments;
+    final args = ModalRoute.of(context).settings.arguments;
+    qrArgument = args is QRArgument ? args : QRArgument.fromString(args);
     return WillPopScope(
       child: CupertinoPageScaffold(
         navigationBar: const CupertinoNavigationBar(
@@ -49,12 +49,11 @@ class _QRCodePageState extends State<QRCodePage> {
         children: [
           Setting.isDesktop
               ? QrImage(
-                  data:
-                      'https://www.test.com/?session=JIFnifaoifjI&random_server=1234567890&random_client=',
+                  data: qrArgument.toString(),
                   version: QrVersions.auto,
                   size: 200.0,
                 )
-              : Text(qrArgument?.url ?? 'none'),
+              : Text(qrArgument.toString()),
         ],
       ),
     );

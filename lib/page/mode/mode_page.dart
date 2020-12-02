@@ -106,10 +106,9 @@ class _ModePageState extends State<ModePage> {
                     if (await UserData.localAuth.canCheckBiometrics) {
                       final isAuthed =
                           await UserData.localAuth.authenticateWithBiometrics(
-                        localizedReason: '用生物辨識啟用裝置碼',
-                        stickyAuth: true,
+                        localizedReason: '請以生物辨識確認身分',
                         androidAuthStrings: AndroidAuthMessages(
-                          fingerprintHint: '啟用裝置碼',
+                          fingerprintHint: '指紋感應器',
                           fingerprintRequiredTitle: '需要生物辨識',
                           fingerprintNotRecognized: '辨識失敗',
                           fingerprintSuccess: '成功',
@@ -126,9 +125,10 @@ class _ModePageState extends State<ModePage> {
                       );
                       if (isAuthed) {
                         final deviceKey = await UserData.storage.read(
-                            key: '${Setting.deviceKeyName}-${userInfo[0]}');
-                        print(deviceKey);
-                      }
+                            key:
+                                '${Setting.deviceKeyName}-${userInfo.join('-')}');
+                      } else
+                        BotToast.showText(text: '認證失敗或取消');
                     }
                   },
             padding: EdgeInsets.symmetric(
@@ -149,11 +149,8 @@ class _ModePageState extends State<ModePage> {
               if (!Setting.isDesktop) {
                 var qrNavFunc = () async {
                   Utility.loading(Duration(milliseconds: 1200), context);
-                  var scanResult = await scan();
-                  // deal 2FA result into QRArgument
                   var result = await Navigator.pushNamed(context, QRCodePage.id,
-                      arguments:
-                          QRArgument(ProcessType.TwoFA, url: scanResult));
+                      arguments: await scan());
                   if (result is String) BotToast.showText(text: result);
                 };
                 if (await Permission.camera.status.isGranted)

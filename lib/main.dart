@@ -8,6 +8,7 @@ import 'package:pokerpass/page/home_page.dart';
 import 'package:pokerpass/page/mode/PC/pc_page.dart';
 import 'package:pokerpass/page/mode/mode_page.dart';
 import 'package:pokerpass/page/qrcode_page.dart';
+import 'package:pokerpass/page/register/binding_page.dart';
 import 'package:pokerpass/page/register/register_page.dart';
 import 'package:pokerpass/page/setting_page.dart';
 import 'package:pokerpass/setting/setting.dart';
@@ -51,6 +52,7 @@ class PokerPassApp extends StatelessWidget {
           routes: {
             ModePage.id: (_) => ModePage(),
             RegisterPage.id: (_) => RegisterPage(),
+            BindingPage.id: (_) => BindingPage(),
             SettingPage.id: (_) => SettingPage(),
             QRCodePage.id: (_) => QRCodePage(),
             PCPage.id: (_) => PCPage(),

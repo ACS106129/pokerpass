@@ -1,3 +1,6 @@
+import 'dart:convert';
+import 'dart:math';
+
 import 'package:bot_toast/bot_toast.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -113,19 +116,21 @@ class _RegisterPageState extends State<RegisterPage> {
                   Utility.loading(Duration(milliseconds: 1200), context);
                   // submit user id and password to server through url, then get device key and session id
                   final isAccept = RegisterResponse.Accept;
-                  final deviceKey = '123456';
-                  final sessionId = 'abc';
+                  final deviceKey = Utility.base64Encode(
+                      Random.secure().nextDouble().toString());
+                  final sessionId = Utility.base64Encode(
+                      Random.secure().nextInt(1 << 32).toString());
                   Future.delayed(Duration(milliseconds: 350), () async {
                     switch (isAccept) {
                       case RegisterResponse.Accept:
+                        // mobile save device key, url and user id
                         if (!Setting.isDesktop)
-                          // save device key and url in mobile device
                           UserData.storage.write(
                               key:
-                                  '${Setting.deviceKeyName}-${urlController.text}',
+                                  '${Setting.deviceKeyName}-${urlController.text}-${userController.text}',
                               value: deviceKey);
+                        // pc generate qrcode to mobile
                         else {
-                          // generate qrcode to mobile
                           var result =
                               await Navigator.pushNamed(context, QRCodePage.id,
                                   arguments: QRArgument(
@@ -207,12 +212,9 @@ class _RegisterPageState extends State<RegisterPage> {
                         var qrNavFunc = () async {
                           Utility.loading(
                               Duration(milliseconds: 1200), context);
-                          var scanResult = await scan();
-                          // deal result into QRArgument
                           var result = await Navigator.pushNamed(
                               context, QRCodePage.id,
-                              arguments: QRArgument(ProcessType.Register,
-                                  url: scanResult));
+                              arguments: await scan());
                           if (result is String) BotToast.showText(text: result);
                         };
                         if (await Permission.camera.status.isGranted)

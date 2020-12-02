@@ -18,7 +18,7 @@ class HomePage extends StatefulWidget {
   _HomePageState createState() => _HomePageState();
 }
 
-class _HomePageState extends State<HomePage> {
+class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   final urlController = TextEditingController(text: urlText);
   final userController = TextEditingController(text: userText);
   final urlFocusNode = FocusNode();
@@ -44,22 +44,25 @@ class _HomePageState extends State<HomePage> {
       if (UserCache.isSystemThemeMode)
         Config.brightnessStream.add(window.platformBrightness);
     };
+    WidgetsBinding.instance.addObserver(this);
   }
 
   @override
   void dispose() {
-    // save user data into local storage
-    UserData.usePrefs((prefs) {
-      prefs.setBool(Setting.systemThemeModeName, UserCache.isSystemThemeMode);
-      prefs.setBool(
-          Setting.darkThemeModeName, UserCache.snapshot.data == Brightness.dark);
-    });
+    savePrefs();
     // dispose here
     urlController.dispose();
     userController.dispose();
     urlFocusNode.dispose();
     userFocusNode.dispose();
+    WidgetsBinding.instance.removeObserver(this);
     super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(final AppLifecycleState state) {
+    if (state == AppLifecycleState.inactive)
+      savePrefs();
   }
 
   @override
@@ -192,6 +195,15 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
+  /// save user preferences into local storage
+  void savePrefs() {
+    UserData.usePrefs((prefs) {
+      prefs.setBool(Setting.systemThemeModeName, UserCache.isSystemThemeMode);
+      prefs.setBool(Setting.darkThemeModeName,
+          UserCache.snapshot.data == Brightness.dark);
+    });
+  }
+
   // update current state and push to next route
   Future<Object> updateAndPush(final BuildContext context, final String toId,
       {Object arguments}) async {
@@ -240,7 +252,6 @@ class _HomePageState extends State<HomePage> {
           allow: true,
         ),
       ],
-      maxLines: 1,
       onTap: () {
         // focus change border color
       },
