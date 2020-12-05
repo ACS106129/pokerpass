@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 
 class Setting {
   static const height = 600.0;
-  static const width = 800.0;
+  static const width = 1200.0;
   static const userLabel = 'user';
   static const urlLabel = 'url';
   static const passwordLabel = 'pw';

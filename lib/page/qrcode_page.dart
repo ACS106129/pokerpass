@@ -53,7 +53,14 @@ class _QRCodePageState extends State<QRCodePage> {
                   version: QrVersions.auto,
                   size: 200.0,
                 )
-              : Text(qrArgument.toString()),
+              : Text('Type: ${qrArgument.type}\n' +
+                  'Device Key: ${qrArgument.deviceKey}\n' +
+                  'Session ID: ${qrArgument.sessionId}\n'
+                      'URL: ${qrArgument.url}\n' +
+                  'User: ${qrArgument.user}\n' +
+                  'Password: ${qrArgument.password}\n' +
+                  'Client Random: ${qrArgument.clientRandom}\n' +
+                  'Server Random: ${qrArgument.serverRandom}'),
         ],
       ),
     );

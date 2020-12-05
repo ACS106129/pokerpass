@@ -130,9 +130,9 @@ class PokerGame extends Game with KeyboardEvents, ButtonEvents {
 
   @override
   void update(double t) {
-    if (phase == 2 && checkpass == true)
+    if (phase == 2 && checkpass == true) {
       secondphase = true;
-    else
+    } else
       secondphase = false;
     // textfield password 4 chars
     // phase 1 remain chars if success >> secondphase=true
@@ -150,19 +150,17 @@ class PokerGame extends Game with KeyboardEvents, ButtonEvents {
       checkpass = true;
       count = 4;
     } else if (e.state == ButtonState.Press && e.name == "輸入" && phase == 2) {
-      checkChallengeCode(security, 1);
+      checkChallengeCode(security, !challengecheck1 ? 1 : 2);
     }
   }
 
   void checkChallengeCode(final String password, final int checkOrder) {
     var res = responseBlocks[(charList.indexOf(password[4]) / 2).floor()];
-    int targetSuitIndex;
-    if (charList.indexOf(password[4]) % 2 == 0)
-      targetSuitIndex = suitBlocks
-          .indexWhere((element) => element.suit == res.lowerSuitBlock.suit);
-    else
-      targetSuitIndex = suitBlocks
-          .indexWhere((element) => element.suit == res.upperSuitBlock.suit);
+    final int targetSuitIndex = suitBlocks.indexWhere((element) =>
+        element.suit ==
+        (charList.indexOf(password[4]) % 2 == 1
+            ? res.lowerSuitBlock.suit
+            : res.upperSuitBlock.suit));
     var passwordPosition =
         (charList.indexOf(password[password.length - checkOrder]) / 2).floor();
     var targetChar =
@@ -177,7 +175,9 @@ class PokerGame extends Game with KeyboardEvents, ButtonEvents {
   void onKeyEvent(RawKeyEvent e) {
     //final bool isKeyDown = e is RawKeyDownEvent;
     //print(" Key: ${e.data.keyLabel} - isKeyDown: $isKeyDown");
-    if (e.isKeyPressed(LogicalKeyboardKey.arrowUp) && firstphase == true) {
+    if (e.isKeyPressed(LogicalKeyboardKey.arrowUp) &&
+        firstphase == true &&
+        secondphase == false) {
       var texts = charBlocks.map((e) => e.text).toList();
       var index = (texts.length / 4).floor();
       var suits = suitBlocks.map((e) => e.suit).toList();
@@ -185,7 +185,8 @@ class PokerGame extends Game with KeyboardEvents, ButtonEvents {
       charBlocks.forEach((e) => e.text = texts[index++ % texts.length]);
       suitBlocks.forEach((e) => e.suit = suits[index2++ % suits.length]);
     } else if (e.isKeyPressed(LogicalKeyboardKey.arrowDown) &&
-        firstphase == true) {
+        firstphase == true &&
+        secondphase == false) {
       var texts = charBlocks.map((e) => e.text).toList();
       var index = (texts.length * 3 / 4).floor();
       var suits = suitBlocks.map((e) => e.suit).toList();

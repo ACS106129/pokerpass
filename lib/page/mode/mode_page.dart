@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:bot_toast/bot_toast.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -99,7 +101,9 @@ class _ModePageState extends State<ModePage> {
                     Future.delayed(Duration(milliseconds: 200), () async {
                       var result =
                           await Navigator.pushNamed(context, PCPage.id);
-                      if (result is String) BotToast.showText(text: result);
+                      if (result is String)
+                        BotToast.showText(text: result);
+                      else if (result == false) Navigator.pop(context, false);
                     });
                   }
                 : () async {
@@ -188,8 +192,19 @@ class _ModePageState extends State<ModePage> {
               } else {
                 Utility.loading(Duration(milliseconds: 600), context);
                 Future.delayed(Duration(milliseconds: 200), () async {
-                  var result =
-                      await Navigator.pushNamed(context, QRCodePage.id);
+                  var result = await Navigator.pushNamed(
+                    context,
+                    QRCodePage.id,
+                    arguments: QRArgument(
+                      ProcessType.TwoFA,
+                      sessionId: Utility.base64Encode(
+                          Random.secure().nextInt(1 << 32).toString()),
+                      serverRandom: Random.secure().nextInt(1 << 32).toString(),
+                      clientRandom: Random.secure().nextInt(1 << 32).toString(),
+                      url: userInfo[0],
+                      user: userInfo[1],
+                    ),
+                  );
                   if (result is String) BotToast.showText(text: result);
                 });
               }

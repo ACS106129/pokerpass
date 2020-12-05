@@ -4,6 +4,7 @@ import 'package:bot_toast/bot_toast.dart';
 import 'package:flame/flame.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:pokerpass/page/finish/finish_page.dart';
 import 'package:pokerpass/page/home_page.dart';
 import 'package:pokerpass/page/mode/PC/pc_page.dart';
 import 'package:pokerpass/page/mode/mode_page.dart';
@@ -56,6 +57,7 @@ class PokerPassApp extends StatelessWidget {
             SettingPage.id: (_) => SettingPage(),
             QRCodePage.id: (_) => QRCodePage(),
             PCPage.id: (_) => PCPage(),
+            FinishPage.id: (_) => FinishPage(),
           },
           navigatorObservers: [
             BotToastNavigatorObserver(),

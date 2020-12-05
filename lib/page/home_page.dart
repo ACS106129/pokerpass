@@ -61,8 +61,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
 
   @override
   void didChangeAppLifecycleState(final AppLifecycleState state) {
-    if (state == AppLifecycleState.inactive)
-      savePrefs();
+    if (state == AppLifecycleState.inactive) savePrefs();
   }
 
   @override
@@ -151,7 +150,22 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                 // await login complete and get value
                 var result = await updateAndPush(context, ModePage.id,
                     arguments: [urlController.text, userController.text]);
-                if (result is String) BotToast.showText(text: result);
+                if (result is String)
+                  BotToast.showText(text: result);
+                else if (result == false)
+                  await showCupertinoDialog(
+                    context: context,
+                    builder: (context) => CupertinoAlertDialog(
+                      title: const Text('警告'),
+                      content: const Text('帳號已鎖定\n請利用綁定信箱解鎖'),
+                      actions: [
+                        CupertinoDialogAction(
+                          child: const Text('確定'),
+                          onPressed: () => Navigator.pop(context),
+                        ),
+                      ],
+                    ),
+                  );
               });
             },
             padding: EdgeInsets.symmetric(

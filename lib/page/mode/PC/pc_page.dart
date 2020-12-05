@@ -4,6 +4,7 @@ import 'package:bot_toast/bot_toast.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/services.dart';
+import 'package:pokerpass/page/finish/finish_page.dart';
 import 'package:pokerpass/poker/poker.dart';
 import 'package:pokerpass/setting/setting.dart';
 import 'package:pokerpass/utility/event/button_events.dart';
@@ -21,6 +22,7 @@ class _PCPageState extends State<PCPage> {
   final suitController = TextEditingController(text: '');
   final challengeCodeController = TextEditingController(text: '');
   var contentPageNumber = 1;
+  var errorTimes = 0;
   PokerGame pokerGame;
 
   @override
@@ -57,7 +59,15 @@ class _PCPageState extends State<PCPage> {
                 BotToast.showText(text: '挑戰碼輸入格式錯誤');
                 return;
               }
-              // submit result
+              if (pokerGame.firstphase &&
+                  pokerGame.challengecheck1 &&
+                  pokerGame.challengecheck2)
+                // submit result
+                Navigator.pushNamed(context, FinishPage.id);
+              else {
+                BotToast.showText(text: '登入失敗${++errorTimes}次');
+                if (errorTimes == 5) Navigator.pop(context, false);
+              }
             },
             child: Text(
               contentPageNumber == 3 ? '送出' : '下一步',
@@ -152,7 +162,8 @@ class _PCPageState extends State<PCPage> {
         );
       case 2:
       case 3:
-        pokerGame ??= PokerGame(contentSize, 123456, passwordController.text);
+        pokerGame ??= PokerGame(contentSize, Random.secure().nextInt(1 << 32),
+            passwordController.text);
         pokerGame.phase = contentPageNumber == 2 ? 1 : 2;
         return Stack(
           alignment: Alignment.topRight,
